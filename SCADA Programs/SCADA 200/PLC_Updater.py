@@ -41,3 +41,31 @@ if actualizador:
         lista_in_out.append(lista_in)
         lista_in_out.append(lista_out)
         lista_PLC.append(lista_in_out)
+if not actualizador:
+        
+    lectura_variable = 255
+    lista_in.append(decimal_a_binario(lectura_variable))
+    lectura_variable = 0
+    lista_in.append(decimal_a_binario(lectura_variable))
+    lectura_variable = 0
+    lista_out.append(decimal_a_binario(lectura_variable))
+    lectura_variable = 255
+    lista_out.append(decimal_a_binario(lectura_variable))
+    lista_in_out.append(lista_in)
+    lista_in_out.append(lista_out)
+    lista_PLC.append(lista_in_out)
+    lista_in.clear()
+    lista_out.clear()
+    lista_in_out.clear()
+    lectura_variable = 0
+    lista_in.append(decimal_a_binario(lectura_variable))
+    lectura_variable = 255
+    lista_in.append(decimal_a_binario(lectura_variable))
+    lectura_variable = 255
+    lista_out.append(decimal_a_binario(lectura_variable))
+    lectura_variable = 0
+    lista_out.append(decimal_a_binario(lectura_variable))
+    lista_in_out.append(lista_in)
+    lista_in_out.append(lista_out)
+    lista_PLC.append(lista_in_out)
+    print(lista_PLC)
