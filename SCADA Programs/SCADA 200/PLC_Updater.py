@@ -1,7 +1,7 @@
 import snap7
 import configparser
 config = configparser.ConfigParser()
-config.read('SCADA Programs\SCADA 200\config.ini')
+config.read('Snap-7-Projects\SCADA Programs\SCADA 200\config.ini')
 PLC_count = int(config.get('Settings', 'PLC_count'))
 bytes_in_read = int(config.get('Settings', 'bytes_in_read'))
 bytes_out_read = int(config.get('Settings', 'bytes_out_read'))
@@ -10,7 +10,7 @@ lista_out = []
 lista_in_out = []
 lista_PLC = []
 plc = snap7.logo.Logo()
-actualizador = 0 #########para parar 0 para iniciar 1
+actualizador = 1 #########para parar 0 para iniciar 1
 
 #while actualizador:
 def decimal_a_binario(decimal):
@@ -37,35 +37,11 @@ if actualizador:
         for j in range(bytes_out_read):
                 lectura_variable = plc.read(f'V106{j+4}')
                 lista_out.append(decimal_a_binario(lectura_variable))
-        plc.disconnect()
+
         lista_in_out.append(lista_in)
-        lista_in_out.append(lista_out)
+        lista_in_out.append(lista_out)        
         lista_PLC.append(lista_in_out)
-if not actualizador:
-        
-    lectura_variable = 255
-    lista_in.append(decimal_a_binario(lectura_variable))
-    lectura_variable = 0
-    lista_in.append(decimal_a_binario(lectura_variable))
-    lectura_variable = 0
-    lista_out.append(decimal_a_binario(lectura_variable))
-    lectura_variable = 255
-    lista_out.append(decimal_a_binario(lectura_variable))
-    lista_in_out.append(lista_in)
-    lista_in_out.append(lista_out)
-    lista_PLC.append(lista_in_out)
-    lista_in.clear()
-    lista_out.clear()
-    lista_in_out.clear()
-    lectura_variable = 0
-    lista_in.append(decimal_a_binario(lectura_variable))
-    lectura_variable = 255
-    lista_in.append(decimal_a_binario(lectura_variable))
-    lectura_variable = 255
-    lista_out.append(decimal_a_binario(lectura_variable))
-    lectura_variable = 0
-    lista_out.append(decimal_a_binario(lectura_variable))
-    lista_in_out.append(lista_in)
-    lista_in_out.append(lista_out)
-    lista_PLC.append(lista_in_out)
-    print(lista_PLC)
+        print(lista_out)
+        plc.disconnect()
+
+       

@@ -16,15 +16,15 @@ for i in range(int(plcy - plcx)):
     if act == 1:
         plc = ts.try_to_connect(ip, 0, 1)
         if plc.read("V12.2"):
-            si_no = int(input(f'\nDoor {plcx + i} Closed, Do you want to open it?\n\nYes - 1\nNo - 0\n'))
-            if si_no == 1:
+            yes_no = input(f'\nDoor {plcx + i} Closed, Do you want to open it?\n\nYes or No\n')
+            if yes_no == ("YES" or "Yes" or "yes"):
                 plc.write("V10.1",1)
                 time.sleep(0.5)
                 plc.write("V10.1",0)
                 plc.disconnect()
         elif plc.read("V12.3"):
-            si_no = int(input(f'\nDoor {plcx + i} Opened, Do you want to close it?\nYes - 1\nNo - 0\n'))
-            if si_no == 1:
+            yes_no = input(f'\nDoor {plcx + i} Opened, Do you want to close it?\nYes or No\n')
+            if yes_no == ("YES" or "Yes" or "yes"):
                 plc.write("V10.1",1)
                 time.sleep(0.5)
                 plc.write("V10.1",0)

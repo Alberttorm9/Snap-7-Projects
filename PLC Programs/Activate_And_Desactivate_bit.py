@@ -1,7 +1,7 @@
 import snap7
 import time
 import Tools as ts
-x = int(input("Que plc?"))
+x = int(input("Que plc?\n"))
 x = x + 100
 plc = snap7.logo.Logo()
 ip = f'192.168.30.{x}'
