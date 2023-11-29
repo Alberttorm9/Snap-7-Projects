@@ -26,7 +26,7 @@ portales_fallidos = []
 # Solicitar al usuario que ingrese un número
 accion = int(input("\nQue quiere hacer?\nAbirir Portales - 1\nCerrar Portales - 2\nApagar Variables - 3\nLeer Variables - 4\n"))
 if accion == 1:
-    accion = int(input("\nSeguro?\nSi\nNo\n\n"))
+    accion = int(input("\nSeguro?\nSi - 1\nNo - 0\n\n"))
     inicio_tiempo = time.time()
     if accion==(1):
         print("\n")
@@ -59,7 +59,7 @@ if accion == 1:
     print(f"\nEl tiempo de ejecución fue de {tiempo_ejecucion} segundos.")
 
 elif accion == 2:
-    accion = input("\nSeguro?\nSi\nNo\n\n")
+    accion = input("\nSeguro?\nSi - 1\nNo - 0\n\n")
     inicio_tiempo = time.time()
     print("\n")
     for i in range(cantidad_de_habitaciones):
