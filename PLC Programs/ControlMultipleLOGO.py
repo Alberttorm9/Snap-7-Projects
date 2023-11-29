@@ -26,9 +26,9 @@ portales_fallidos = []
 # Solicitar al usuario que ingrese un número
 accion = int(input("\nQue quiere hacer?\nAbirir Portales - 1\nCerrar Portales - 2\nApagar Variables - 3\nLeer Variables - 4\n"))
 if accion == 1:
-    accion = input("\nSeguro?\nSi\nNo\n\n")
+    accion = int(input("\nSeguro?\nSi\nNo\n\n"))
     inicio_tiempo = time.time()
-    if accion==("Si" or "si" or "SI"):
+    if accion==(1):
         print("\n")
         for i in range(cantidad_de_habitaciones):
             plc = snap7.logo.Logo()
@@ -61,25 +61,24 @@ if accion == 1:
 elif accion == 2:
     accion = input("\nSeguro?\nSi\nNo\n\n")
     inicio_tiempo = time.time()
-    if accion==("Si" or "si" or "SI"):
-        print("\n")
-        for i in range(cantidad_de_habitaciones):
-            plc = snap7.logo.Logo()
-            try:
-                plc.connect(f'192.168.30.{i+101}', 0, 1)
-                if plc.read(f'{portal_abierto}'):
-                    plc.write(f'{pulsador_portal}', 1)
-                    time.sleep(0.5)
-                    plc.write(f'{pulsador_portal}', 0)
-                    print(f"PLC {i+101} Cerrando")
-                elif plc.read(f'{portal_cerrado}'):
-                    portales_ya_cerrados.append(i+101)
-                else:
-                    portales_ni_cerrados_ni_abiertos.append(i+101)
-                plc.disconnect()
-            except Exception as err:
-                print(f"PLC {i+101} Error")
-                portales_fallidos.append(i+101)
+    print("\n")
+    for i in range(cantidad_de_habitaciones):
+        plc = snap7.logo.Logo()
+        try:
+            plc.connect(f'192.168.30.{i+101}', 0, 1)
+            if plc.read(f'{portal_abierto}'):
+                plc.write(f'{pulsador_portal}', 1)
+                time.sleep(0.5)
+                plc.write(f'{pulsador_portal}', 0)
+                print(f"PLC {i+101} Cerrando")
+            elif plc.read(f'{portal_cerrado}'):
+                portales_ya_cerrados.append(i+101)
+            else:
+                portales_ni_cerrados_ni_abiertos.append(i+101)
+            plc.disconnect()
+        except Exception as err:
+            print(f"PLC {i+101} Error")
+            portales_fallidos.append(i+101)
 
     print(f"\n\nFallaron: {len(portales_fallidos)}")
     print(f'Los fallidos son: {portales_fallidos}')
