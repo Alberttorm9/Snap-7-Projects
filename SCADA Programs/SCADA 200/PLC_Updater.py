@@ -10,7 +10,6 @@ lista_out = []
 lista_in_out = []
 lista_PLC = []
 plc = snap7.logo.Logo()
-actualizador = 1 #########para parar 0 para iniciar 1
 
 #while actualizador:
 def decimal_a_binario(decimal):
@@ -23,25 +22,26 @@ def decimal_a_binario(decimal):
         ceros_faltantes = 8 - len(binario)
         binario.extend([0] * ceros_faltantes)
     return binario
-if actualizador:
-    actualizador = 0
-    for i in range(PLC_count):
-        while not (plc.get_connected()):
-            try:
-                plc.connect(f'192.168.30.{i+101}', 0, 1)
-            except Exception:
-                plc.connect(f'192.168.30.{i+101}', 0, 1)
-        for j in range(bytes_in_read):
-                lectura_variable = plc.read(f'V102{j+4}')
-                lista_in.append(decimal_a_binario(lectura_variable))
-        for j in range(bytes_out_read):
-                lectura_variable = plc.read(f'V106{j+4}')
-                lista_out.append(decimal_a_binario(lectura_variable))
+def actualizador(plc_num):
+    lista_in.clear()
+    lista_out.clear()
+    lista_in_out.clear()
+    while not (plc.get_connected()):
+        try:
+            plc.connect(f'192.168.30.{plc_num+101}', 0, 1)
+        except Exception:
+            plc.connect(f'192.168.30.{plc_num+101}', 0, 1)
+    for j in range(bytes_in_read):
+            lectura_variable = plc.read(f'V102{j+4}')
+            lista_in.append(decimal_a_binario(lectura_variable))
+    for j in range(bytes_out_read):
+            lectura_variable = plc.read(f'V106{j+4}')
+            lista_out.append(decimal_a_binario(lectura_variable))
 
-        lista_in_out.append(lista_in)
-        lista_in_out.append(lista_out)        
-        lista_PLC.append(lista_in_out)
-        print(lista_out)
-        plc.disconnect()
+    lista_in_out.append(lista_in)
+    lista_in_out.append(lista_out)
+    print(lista_in_out)
+    plc.disconnect()
+    return lista_in_out
 
-       
+a = actualizador(0)       
