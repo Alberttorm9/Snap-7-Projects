@@ -7,19 +7,16 @@ def create_bit_squares(plc_num):
     global bit_squares_created
     if bit_squares_created == False:
         lista_variables = PLC_Updater.actualizador(plc_num)
-        print("c")
-        print(lista_variables)
         time.sleep(5)
         for j in range(bytes_in_read):
             for k in range(7):
                 if not (lista_variables[0][j][k]):
-
                     color = "red"
                 else:
                     color = "green"
-                square = tk.Frame(Bit_frame, width=50, height=50, bg=color)
-                square.grid(row=j, column=k, padx=5, pady=5)
-                Bit_Squares.append(square)
+                Bit_square = tk.Frame(Bit_frame, width=50, height=50, bg=color)
+                Bit_square.grid(row=j, column=k, padx=5, pady=5)
+                Bit_Squares.append(Bit_square)
 
         for j in range(bytes_out_read):
             for k in range(7):
@@ -27,50 +24,51 @@ def create_bit_squares(plc_num):
                     color = "blue"
                 else:
                     color = "yellow"
-                square = tk.Frame(Bit_frame, width=50, height=50, bg=color)
-                square.grid(row=(j + int(config.get('Settings', 'bytes_in_read'))), column=k, padx=5, pady=5)  
-                Bit_Squares.append(square)
-        
-        back_button = tk.Button(Bit_frame, text='Atrás', command=on_back_button_click)
-        back_button.grid(row=0, column=8, columnspan=2, pady=10)
+                Bit_square = tk.Frame(Bit_frame, width=50, height=50, bg=color)
+                Bit_square.grid(row=(j + int(config.get('Settings', 'bytes_in_read'))), column=k, padx=5, pady=5)  
+                Bit_Squares.append(Bit_square)
         bit_squares_created = True
     else:
         lista_variables = PLC_Updater.actualizador(plc_num)
-        print("b")
-        print(lista_variables)
         time.sleep(5)
+        a = 0 ####
         for j in range(bytes_in_read):
             for k in range(7):
                 if not (lista_variables[0][j][k]):
-                    Bit_Squares[(int(j*7))].config(bg='red')
+                    a += 1 ####
+                    print(a)
+                    Bit_Squares[(int(k+(j*bytes_in_read)))].config(bg='red')
                 else:
-                    Bit_Squares[(int(j*7))].config(bg='green')
+                    a += 1 ####
+                    print(f'{a}' + "w")
+                    Bit_Squares[(int(k+(j*bytes_in_read)))].config(bg='green')
 
         for j in range(bytes_out_read):
             for k in range(7):
                 if not (lista_variables[1][j][k]):
                     Bit_Squares[(int(j+((bytes_in_read+j)*7)))].config(bg='blue')
                 else:
-                    Bit_Squares[(int(j+((bytes_in_read+j)*7)))].config(bg='yellow')
-
-    print("a")
-    window.after(3000, lambda: create_bit_squares(plc_num)) 
-
+                    Bit_Squares[(int(j+((bytes_in_read+j)*7)))].config(bg='yellow') 
+    after_id = window.after(1000, lambda: create_bit_squares(plc_num))
+    back_button = tk.Button(Bit_frame, text='Atrás', command=on_back_button_click(after_id))
+    back_button.grid(row=0, column=8, columnspan=2, pady=10)#Problema con el boton
 def create_PLC_squares():
         PLC_frame.grid()
         for i in range(PLC_count):
             PLC_square = tk.Frame(PLC_frame, width=square_size, height=square_size, bg='blue')
+            PLC_square.bind('<Button-1>', lambda event, plc_num=i: on_square_click(plc_num))
             PLC_square.grid(row=i//(int(config.get('Settings', 'distributionX'))), column=i%(int(config.get('Settings', 'distributionY'))), padx=5, pady=5)
-            print(f'El valor es {i}')
-            PLC_square.bind('<Button-1>', lambda event : on_square_click(i))
+            print(f'El valor 1 es {i}')
             PLC_Squares.append(PLC_square)  
 
 def on_square_click(plc_num):
+    print(f'El valor 2 es {plc_num}')
     PLC_frame.grid_forget()
     Bit_frame.grid()
     create_bit_squares(plc_num)
 
-def on_back_button_click():
+def on_back_button_click(after_id):
+    window.after_cancel(after_id)
     Bit_Squares.clear()
     Bit_frame.grid_forget()
     create_PLC_squares()

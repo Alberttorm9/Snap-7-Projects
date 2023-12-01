@@ -1,6 +1,6 @@
 import snap7
 import sys
-ip = "192.168.30.104"
+ip = "192.168.30.103"
 byte = "V1064"
 plc = snap7.logo.Logo()
 plc.connect(ip, 0, 1)

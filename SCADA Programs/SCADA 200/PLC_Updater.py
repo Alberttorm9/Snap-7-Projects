@@ -43,6 +43,4 @@ def actualizador(plc_num):
     print(f'Estas leyendo el plc 192.168.30.{plc_num+101}')
     plc.disconnect()
     return lista_in_out
-
-a = actualizador(0)     
-print(a)  
+ 
