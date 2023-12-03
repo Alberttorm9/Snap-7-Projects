@@ -7,7 +7,6 @@ def create_bit_squares(plc_num):
     global bit_squares_created
     if bit_squares_created == False:
         lista_variables = PLC_Updater.actualizador(plc_num)
-        time.sleep(2)
         for j in range(bytes_in_read):
             for k in range(7):
                 if not (lista_variables[0][j][k]):
@@ -17,7 +16,6 @@ def create_bit_squares(plc_num):
                 Bit_square = tk.Frame(Bit_frame, width=50, height=50, bg=color)
                 Bit_square.grid(row=j, column=k, padx=5, pady=5)
                 Bit_Squares.append(Bit_square)
-
         for j in range(bytes_out_read):
             for k in range(7):
                 if not (lista_variables[1][j][k]):
@@ -28,28 +26,29 @@ def create_bit_squares(plc_num):
                 Bit_square.grid(row=(j + int(config.get('Settings', 'bytes_in_read'))), column=k, padx=5, pady=5)  
                 Bit_Squares.append(Bit_square)
                 #se ve que este 2º for de j no está escribiendo bien los Bit_Square
-                back_button = tk.Button(Bit_frame, text='Atrás', command=on_back_button_click())
+                back_button = tk.Button(Bit_frame, text='Atrás', command=on_back_button_click)
                 back_button.grid(row=0, column=8, columnspan=2, pady=10)
         bit_squares_created = True
     else:
         lista_variables = PLC_Updater.actualizador(plc_num)
         for j in range(bytes_in_read):
-            for k in range(7):    
+            for k in range(7):       
                 if not (lista_variables[0][j][k]):
-                    Bit_Squares[(int(k+(j)))].config(bg='red')
+                    Bit_Squares[(k+(j*7))].config(bg='red')
                 else:
-                    Bit_Squares[(int(k+(j)))].config(bg='green')
+                    Bit_Squares[(k+(j*7))].config(bg='green')
 
         for j in range(bytes_out_read):
             for k in range(7):
                 if not (lista_variables[1][j][k]):
-                    Bit_Squares[(int(k+(j*bytes_in_read)))].config(bg='blue')
+                    b = (k+((j*7)+(bytes_in_read*7)))
+                    Bit_Squares[(k+((j*7)+(bytes_in_read*7)))].config(bg='blue')
                 else:
-                    Bit_Squares[(int(k+(j*bytes_in_read)))].config(bg='yellow')
+                    b = (k+((j*7)+(bytes_in_read*7)))
+                    Bit_Squares[(k+((j*7)+(bytes_in_read*7)))].config(bg='yellow')
    
     window.after(4000, lambda: create_bit_squares(plc_num))
-     
-    
+
 def create_PLC_squares():
         PLC_frame.grid()
         for i in range(PLC_count):
@@ -70,7 +69,7 @@ def on_back_button_click():
 
 
 config = configparser.ConfigParser()
-config.read(r'Snap-7-Projects\SCADA Programs\SCADA 200\config.ini')
+config.read(r'SCADA Programs\SCADA 200\config.ini')
 square_size = int(config.get('Settings', 'square_size'))
 PLC_count = int(config.get('Settings', 'PLC_count'))
 bytes_in_read = int(config.get('Settings', 'bytes_in_read'))
