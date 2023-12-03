@@ -53,7 +53,7 @@ def actualizador(plc_num):
             lista_out.append(decimal_a_binario(lectura_variable))
             lectura_variable = 25
             lista_out.append(decimal_a_binario(lectura_variable))
-        else:
+        elif (cambiar_valores_simulados > 4) and (cambiar_valores_simulados < 10):
             lectura_variable = 86
             lista_in.append(decimal_a_binario(lectura_variable))
             lectura_variable = 24
@@ -61,6 +61,15 @@ def actualizador(plc_num):
             lectura_variable = 124
             lista_out.append(decimal_a_binario(lectura_variable))
             lectura_variable = 254
+            lista_out.append(decimal_a_binario(lectura_variable))
+        else:
+            lectura_variable = 233
+            lista_in.append(decimal_a_binario(lectura_variable))
+            lectura_variable = 2
+            lista_in.append(decimal_a_binario(lectura_variable))
+            lectura_variable = 168
+            lista_out.append(decimal_a_binario(lectura_variable))
+            lectura_variable = 101
             lista_out.append(decimal_a_binario(lectura_variable))
 
 

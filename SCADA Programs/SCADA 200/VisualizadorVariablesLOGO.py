@@ -13,18 +13,21 @@ def create_bit_squares(plc_num):
                     color = "red"
                 else:
                     color = "green"
-                Bit_square = tk.Frame(Bit_frame, width=50, height=50, bg=color)
+                Bit_square = tk.Canvas(Bit_frame, width=50, height=50, bg=color)
+                Bit_square.create_text(25, 25, text=f'Bit I{j}.{k}', fill='black')
                 Bit_square.grid(row=j, column=k, padx=5, pady=5)
                 Bit_Squares.append(Bit_square)
         for j in range(bytes_out_read):
             for k in range(8):
                 if not (lista_variables[1][j][k]):
-                    color = "blue"
+                    color = "white"
                 else:
-                    color = "yellow"
-                Bit_square = tk.Frame(Bit_frame, width=50, height=50, bg=color)
+                    color = "lightblue"
+                Bit_square = tk.Canvas(Bit_frame, width=50, height=50, bg=color)
+                Bit_square.create_text(25, 25, text=f'Bit Q{j}.{k}', fill='black')
                 Bit_square.grid(row=(j + int(config.get('Settings', 'bytes_in_read'))), column=k, padx=5, pady=5)  
                 Bit_Squares.append(Bit_square)
+        bit_squares_created = True
         bit_squares_created = True
     else:
         lista_variables = PLC_Updater.actualizador(plc_num)
@@ -38,21 +41,22 @@ def create_bit_squares(plc_num):
         for j in range(bytes_out_read):
             for k in range(8):
                 if not (lista_variables[1][j][k]):
-                    Bit_Squares[(k+((j*8)+(bytes_in_read*8)))].config(bg='blue')
+                    Bit_Squares[(k+((j*8)+(bytes_in_read*8)))].config(bg='white')
                 else:
-                    Bit_Squares[(k+((j*8)+(bytes_in_read*8)))].config(bg='yellow')
+                    Bit_Squares[(k+((j*8)+(bytes_in_read*8)))].config(bg='lightblue')
    
-    after_id = window.after(4000, lambda: create_bit_squares(plc_num))
+    after_id = window.after(1000, lambda: create_bit_squares(plc_num))
     back_button = tk.Button(Bit_frame, text='Atrás', command= lambda:on_back_button_click(after_id))
     back_button.grid(row=0, column=8, columnspan=2, pady=10)
 
 def create_PLC_squares():
-        PLC_frame.grid()
-        for i in range(PLC_count):
-            PLC_square = tk.Frame(PLC_frame, width=square_size, height=square_size, bg='blue')
-            PLC_square.bind('<Button-1>', lambda event, plc_num=i: on_square_click(plc_num))
-            PLC_square.grid(row=i//(int(config.get('Settings', 'distributionX'))), column=i%(int(config.get('Settings', 'distributionY'))), padx=5, pady=5)
-            PLC_Squares.append(PLC_square)  
+    PLC_frame.grid()
+    for i in range(PLC_count):
+        PLC_square = tk.Canvas(PLC_frame, width=square_size, height=square_size, bg='blue')
+        PLC_square.create_text(square_size // 2, square_size // 2, text=f'PLC {i+1}', fill='white')
+        PLC_square.bind('<Button-1>', lambda event, plc_num=i: on_square_click(plc_num))
+        PLC_square.grid(row=i//(int(config.get('Settings', 'distributionX'))), column=i%(int(config.get('Settings', 'distributionY'))), padx=5, pady=5)
+        PLC_Squares.append(PLC_square)  
 
 def on_square_click(plc_num):
     PLC_frame.grid_forget()
