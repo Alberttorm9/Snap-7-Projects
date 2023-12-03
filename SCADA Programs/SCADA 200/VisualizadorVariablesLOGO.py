@@ -4,11 +4,11 @@ import PLC_Updater
 import time
 
 def create_bit_squares(plc_num):
-    global bit_squares_created
+    global bit_squares_created, after_id
     if bit_squares_created == False:
         lista_variables = PLC_Updater.actualizador(plc_num)
         for j in range(bytes_in_read):
-            for k in range(7):
+            for k in range(8):
                 if not (lista_variables[0][j][k]):
                     color = "red"
                 else:
@@ -17,7 +17,7 @@ def create_bit_squares(plc_num):
                 Bit_square.grid(row=j, column=k, padx=5, pady=5)
                 Bit_Squares.append(Bit_square)
         for j in range(bytes_out_read):
-            for k in range(7):
+            for k in range(8):
                 if not (lista_variables[1][j][k]):
                     color = "blue"
                 else:
@@ -25,29 +25,26 @@ def create_bit_squares(plc_num):
                 Bit_square = tk.Frame(Bit_frame, width=50, height=50, bg=color)
                 Bit_square.grid(row=(j + int(config.get('Settings', 'bytes_in_read'))), column=k, padx=5, pady=5)  
                 Bit_Squares.append(Bit_square)
-                #se ve que este 2º for de j no está escribiendo bien los Bit_Square
-                back_button = tk.Button(Bit_frame, text='Atrás', command=on_back_button_click)
-                back_button.grid(row=0, column=8, columnspan=2, pady=10)
         bit_squares_created = True
     else:
         lista_variables = PLC_Updater.actualizador(plc_num)
         for j in range(bytes_in_read):
-            for k in range(7):       
+            for k in range(8):       
                 if not (lista_variables[0][j][k]):
-                    Bit_Squares[(k+(j*7))].config(bg='red')
+                    Bit_Squares[(k+(j*8))].config(bg='red')
                 else:
-                    Bit_Squares[(k+(j*7))].config(bg='green')
+                    Bit_Squares[(k+(j*8))].config(bg='green')
 
         for j in range(bytes_out_read):
-            for k in range(7):
+            for k in range(8):
                 if not (lista_variables[1][j][k]):
-                    b = (k+((j*7)+(bytes_in_read*7)))
-                    Bit_Squares[(k+((j*7)+(bytes_in_read*7)))].config(bg='blue')
+                    Bit_Squares[(k+((j*8)+(bytes_in_read*8)))].config(bg='blue')
                 else:
-                    b = (k+((j*7)+(bytes_in_read*7)))
-                    Bit_Squares[(k+((j*7)+(bytes_in_read*7)))].config(bg='yellow')
+                    Bit_Squares[(k+((j*8)+(bytes_in_read*8)))].config(bg='yellow')
    
-    window.after(4000, lambda: create_bit_squares(plc_num))
+    after_id = window.after(4000, lambda: create_bit_squares(plc_num))
+    back_button = tk.Button(Bit_frame, text='Atrás', command= lambda:on_back_button_click(after_id))
+    back_button.grid(row=0, column=8, columnspan=2, pady=10)
 
 def create_PLC_squares():
         PLC_frame.grid()
@@ -62,7 +59,11 @@ def on_square_click(plc_num):
     Bit_frame.grid()
     create_bit_squares(plc_num)
 
-def on_back_button_click():
+def on_back_button_click(after_id):
+    global bit_squares_created
+    if after_id!=None:
+        window.after_cancel(after_id)
+        bit_squares_created = False
     Bit_Squares.clear()
     Bit_frame.grid_forget()
     create_PLC_squares()

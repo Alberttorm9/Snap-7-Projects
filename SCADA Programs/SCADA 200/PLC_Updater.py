@@ -11,6 +11,7 @@ lista_in_out = []
 lista_PLC = []
 plc = snap7.logo.Logo()
 simulador = 1
+cambiar_valores_simulados = 0
 #while actualizador:
 def decimal_a_binario(decimal):
     binario = []
@@ -23,6 +24,7 @@ def decimal_a_binario(decimal):
         binario.extend([0] * ceros_faltantes)
     return binario
 def actualizador(plc_num):
+    global cambiar_valores_simulados
     lista_in.clear()
     lista_out.clear()
     lista_in_out.clear()
@@ -41,14 +43,25 @@ def actualizador(plc_num):
                 lista_out.append(decimal_a_binario(lectura_variable))
         plc.disconnect()
     else:
-        lectura_variable = 15
-        lista_in.append(decimal_a_binario(lectura_variable))
-        lectura_variable = 21
-        lista_in.append(decimal_a_binario(lectura_variable))
-        lectura_variable = 86
-        lista_out.append(decimal_a_binario(lectura_variable))
-        lectura_variable = 25
-        lista_out.append(decimal_a_binario(lectura_variable))
+        cambiar_valores_simulados += 1
+        if cambiar_valores_simulados < 5:
+            lectura_variable = 15
+            lista_in.append(decimal_a_binario(lectura_variable))
+            lectura_variable = 21
+            lista_in.append(decimal_a_binario(lectura_variable))
+            lectura_variable = 86
+            lista_out.append(decimal_a_binario(lectura_variable))
+            lectura_variable = 25
+            lista_out.append(decimal_a_binario(lectura_variable))
+        else:
+            lectura_variable = 86
+            lista_in.append(decimal_a_binario(lectura_variable))
+            lectura_variable = 24
+            lista_in.append(decimal_a_binario(lectura_variable))
+            lectura_variable = 124
+            lista_out.append(decimal_a_binario(lectura_variable))
+            lectura_variable = 254
+            lista_out.append(decimal_a_binario(lectura_variable))
 
 
     lista_in_out.append(lista_in)
