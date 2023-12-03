@@ -61,10 +61,9 @@ def on_square_click(plc_num):
 
 def on_back_button_click(after_id):
     global bit_squares_created
-    if after_id!=None:
-        window.after_cancel(after_id)
-        bit_squares_created = False
+    window.after_cancel(after_id)
     Bit_Squares.clear()
+    bit_squares_created = False
     Bit_frame.grid_forget()
     create_PLC_squares()
 
