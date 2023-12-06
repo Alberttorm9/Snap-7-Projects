@@ -1,20 +1,21 @@
 import tkinter as tk
+def shrink_square():
+    global after_id
+    x1, y1, x2, y2 = canvas.coords(square)
+    if x2 - x1 > 0 and y2 - y1 > 0:
+        canvas.coords(square, x1 + 2, y1 + 2, x2 - 2, y2 - 2)
+        after_id = root.after(100, shrink_square)
+    if x2 - x1 < 3 and y2 - y1 < 3:
+        canvas.pack_forget()
+        root.after_cancel(after_id)
+    
 
-def mostrar_numero(event, numero):
-    print("El cuadrado pulsado tiene el número:", numero)
 
 root = tk.Tk()
-root.geometry("550x100")
-
-canvas = tk.Canvas(root, width=500, height=50)
+canvas = tk.Canvas(root, width=600, height=300)
 canvas.pack()
 
-# Dibujar los cuadrados y asociar un número a cada uno
-for i in range(10):
-    x0 = i * 50
-    x1 = x0 + 50
-    canvas.create_rectangle(x0, 0, x1, 50, fill="lightblue")
-    canvas.tag_bind("cuadrado"+str(i+1), "<Button-1>", lambda event, num=i+1: mostrar_numero(event, num))
-    canvas.create_text(x0+25, 25, text=str(i+1), font=("Arial", 12), tags="cuadrado"+str(i+1))
-
+square = canvas.create_rectangle(100, 100, 200, 200, fill="blue")
+after_id = 0
+shrink_square()
 root.mainloop()
