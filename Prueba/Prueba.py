@@ -1,31 +1,26 @@
+import snap7
+import time
+import Tools as ts
 import tkinter as tk
 
-# Función para leer el valor del archivo y configurar el color del cuadrado
-def actualizar_cuadrado():
-    # Lee el contenido del archivo
-    with open('Snap-7-Projects\Prueba\color.txt', 'r') as file:
-        contenido = file.read()
-    
-    # Comprueba el valor leído y configura el color del cuadrado
-    if contenido.strip() == '1':
-        canvas.itemconfig(cuadrado, fill='blue')
-    elif contenido.strip() == '2':
-        canvas.itemconfig(cuadrado, fill='red')
-    
-    # Vuelve a llamar a la función después de un intervalo de tiempo (en milisegundos)
-    ventana.after(1000, actualizar_cuadrado)  # Cambia el valor 1000 según tus necesidades
+plc = snap7.logo.Logo()
 
-# Crea la ventana de tkinter
-ventana = tk.Tk()
-ventana.title('Programa B')
+# Crear la ventana
+root = tk.Tk()
+PLC_Byte = PLC_Bit = 1
+# Crear un frame para contener los elementos
+frame = tk.Frame(root)
+frame.pack()
 
-# Crea un lienzo (canvas) y dibuja un cuadrado
-canvas = tk.Canvas(ventana, width=200, height=200)
-cuadrado = canvas.create_rectangle(50, 50, 150, 150, fill='blue')
-canvas.pack()
+# Crear un cuadrado de color verde en el centro del frame
+cuadrado = tk.Label(frame, width=10, height=5, bg="green")
+cuadrado.pack(pady=10)
+ip = f'192.168.30.101'
+plc = ts.try_to_connect(ip, 0, 1)
+plc.write(f'V{PLC_Byte}.{PLC_Bit}',1)
+# Crear botones para cambiar el color del cuadrado
+boton_rojo = tk.Button(root, text="Activar", command=lambda:plc.write(f'V{PLC_Byte}.{PLC_Bit}',1))
+boton_rojo.pack(side=tk.RIGHT, padx=5)
 
-# Inicia la actualización del cuadrado
-actualizar_cuadrado()
-
-# Ejecuta el bucle principal de la ventana
-ventana.mainloop()
+# Mostrar la ventana
+root.mainloop()
