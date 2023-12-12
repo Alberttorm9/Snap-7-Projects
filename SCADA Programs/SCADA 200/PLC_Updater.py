@@ -10,9 +10,9 @@ lista_out = []
 lista_in_out = []
 lista_PLC = []
 plc = snap7.logo.Logo()
-simulador = 1
+simulador = 0
 cambiar_valores_simulados = 0
-#while actualizador:
+
 def decimal_a_binario(decimal):
     binario = []
     while decimal > 0:
@@ -34,7 +34,10 @@ def actualizador(plc_num):
             try:
                 plc.connect(f'192.168.30.{plc_num+101}', 0, 1)
             except Exception:
-                plc.connect(f'192.168.30.{plc_num+101}', 0, 1)
+                try:
+                    plc.connect(f'192.168.30.{plc_num+101}', 0, 1)
+                except Exception:
+                    return 0
         for j in range(bytes_in_read):
                 lectura_variable = plc.read(f'V102{j+4}')
                 lista_in.append(decimal_a_binario(lectura_variable))

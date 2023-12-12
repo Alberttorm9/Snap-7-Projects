@@ -7,28 +7,33 @@ def create_bit_squares(plc_num):
     global bit_squares_created, after_id
     if bit_squares_created == False:
         lista_variables = PLC_Updater.actualizador(plc_num)
-        for j in range(bytes_in_read):
-            for k in range(8):
-                if not (lista_variables[0][j][k]):
-                    color = "red"
-                else:
-                    color = "green"
-                Bit_square = tk.Canvas(Bit_frame, width=50, height=50, bg=color)
-                Bit_square.create_text(25, 25, text=f'Bit I{j}.{k}', fill='black')
-                Bit_square.grid(row=j, column=k, padx=5, pady=5)
-                Bit_Squares.append(Bit_square)
-        for j in range(bytes_out_read):
-            for k in range(8):
-                if not (lista_variables[1][j][k]):
-                    color = "white"
-                else:
-                    color = "lightblue"
-                Bit_square = tk.Canvas(Bit_frame, width=50, height=50, bg=color)
-                Bit_square.create_text(25, 25, text=f'Bit Q{j}.{k}', fill='black')
-                Bit_square.grid(row=(j + int(config.get('Settings', 'bytes_in_read'))), column=k, padx=5, pady=5)  
-                Bit_Squares.append(Bit_square)
-        bit_squares_created = True
-        bit_squares_created = True
+        if lista_variables != 0:
+            for j in range(bytes_in_read):
+                for k in range(8):
+                    if not (lista_variables[0][j][k]):
+                        color = "red"
+                    else:
+                        color = "green"
+                    Bit_square = tk.Canvas(Bit_frame, width=50, height=50, bg=color)
+                    Bit_square.create_text(25, 25, text=f'Bit I{j}.{k}', fill='black')
+                    Bit_square.grid(row=j, column=k, padx=5, pady=5)
+                    Bit_Squares.append(Bit_square)
+            for j in range(bytes_out_read):
+                for k in range(8):
+                    if not (lista_variables[1][j][k]):
+                        color = "white"
+                    else:
+                        color = "lightblue"
+                    Bit_square = tk.Canvas(Bit_frame, width=50, height=50, bg=color)
+                    Bit_square.create_text(25, 25, text=f'Bit Q{j}.{k}', fill='black')
+                    Bit_square.grid(row=(j + int(config.get('Settings', 'bytes_in_read'))), column=k, padx=5, pady=5)  
+                    Bit_Squares.append(Bit_square)
+            bit_squares_created = True
+        else:
+            Bit_square = tk.Canvas(Bit_frame, width=120, height=30, bg="red")
+            Bit_square.create_text(60, 15, text="PLC Desconectado", fill='black', anchor='center')
+            Bit_square.grid(row=0, column=0, padx=5, pady=5)
+            bit_squares_created = False
     else:
         lista_variables = PLC_Updater.actualizador(plc_num)
         for j in range(bytes_in_read):
@@ -44,8 +49,8 @@ def create_bit_squares(plc_num):
                     Bit_Squares[(k+((j*8)+(bytes_in_read*8)))].config(bg='white')
                 else:
                     Bit_Squares[(k+((j*8)+(bytes_in_read*8)))].config(bg='lightblue')
-   
-    after_id = window.after(1000, lambda: create_bit_squares(plc_num))
+    if bit_squares_created:
+        after_id = window.after(1000, lambda: create_bit_squares(plc_num))
     back_button = tk.Button(Bit_frame, text='Atrás', command= lambda:on_back_button_click(after_id))
     back_button.grid(row=0, column=8, columnspan=2, pady=10)
 
@@ -64,12 +69,14 @@ def on_square_click(plc_num):
     create_bit_squares(plc_num)
 
 def on_back_button_click(after_id):
-    global bit_squares_created
+    global bit_squares_created, Bit_frame
     window.after_cancel(after_id)
     Bit_Squares.clear()
     bit_squares_created = False
     Bit_frame.grid_forget()
     create_PLC_squares()
+    Bit_frame.destroy()
+    Bit_frame = tk.Frame(window, bg='lightgreen')
 
 
 config = configparser.ConfigParser()
