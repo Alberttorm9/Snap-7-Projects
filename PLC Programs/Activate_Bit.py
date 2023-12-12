@@ -12,7 +12,7 @@ def actualizar_bit():
     else:
         bit_plc.config(bg="Red")
     if after_id == 0:
-        boton_after_stop.pack(pady=10)
+        boton_after_stop.place(x=118, y= 140, anchor='center')
     else:
         boton_after_stop.config(command=volver_atras)
     after_id = root.after(1000, actualizar_bit)
@@ -21,10 +21,10 @@ def volver_atras():
     global after_id
     root.after_cancel(after_id)
     after_id = 0
-    boton_after_stop.pack_forget()
-    bit_plc.pack_forget()
-    boton_activar.pack_forget()
-    boton_desactivar.pack_forget()
+    boton_after_stop.place_forget()
+    bit_plc.place_forget()
+    boton_activar.place_forget()
+    boton_desactivar.place_forget()
     plc.disconnect()
     texto.config(text="Which PLC?")
     texto.pack()
@@ -33,9 +33,10 @@ def volver_atras():
 
 def plc_bit_changer():
     global PLC_Byte, PLC_Bit, plc
-    bit_plc.pack(pady=10)
-    boton_desactivar.pack(side=tk.RIGHT, padx=5)
-    boton_activar.pack(side=tk.LEFT, padx=5)
+    bit_plc.place(x=120, y= 50, anchor='center')
+    boton_desactivar.place(x=65, y= 110, anchor='w')
+    boton_activar.place(x=175, y= 110, anchor='e')
+    
     actualizar_bit()
 
 def obtener_texto():
@@ -89,13 +90,14 @@ def obtener_texto():
 PLC_Byte = PLC_Bit = step = 0
 after_id = 0
 root = tk.Tk()
+root.update_idletasks()
 entrada = tk.Entry(root)
 boton = tk.Button(root, text="Enter", command=obtener_texto)
 texto = tk.Label(root, text="Which PLC?")
 bit_plc = tk.Label(root, width=15, height=5)
 boton_after_stop = tk.Button(root, text="Atrás")
-boton_activar = tk.Button(root, text="Desactivar", command=lambda:plc.write(f'V{PLC_Byte}.{PLC_Bit}',0))
-boton_desactivar = tk.Button(root, text="Activar", command=lambda:plc.write(f'V{PLC_Byte}.{PLC_Bit}',1))
+boton_desactivar = tk.Button(root, text="Off", command=lambda:plc.write(f'V{PLC_Byte}.{PLC_Bit}',0))
+boton_activar = tk.Button(root, text="On", command=lambda:plc.write(f'V{PLC_Byte}.{PLC_Bit}',1))
 
 texto.pack()
 
