@@ -90,7 +90,6 @@ def obtener_texto():
 PLC_Byte = PLC_Bit = step = 0
 after_id = 0
 root = tk.Tk()
-root.update_idletasks()
 entrada = tk.Entry(root)
 boton = tk.Button(root, text="Enter", command=obtener_texto)
 texto = tk.Label(root, text="Which PLC?")
