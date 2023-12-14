@@ -12,7 +12,7 @@ def actualizar_bit():
     else:
         bit_plc.config(bg="Red")
     if after_id == 0:
-        boton_after_stop.place(x=118, y= 140, anchor='center')
+        boton_after_stop.place(x=88, y= 140, anchor='center')
     else:
         boton_after_stop.config(command=volver_atras)
     after_id = root.after(1000, actualizar_bit)
@@ -33,9 +33,9 @@ def volver_atras():
 
 def plc_bit_changer():
     global PLC_Byte, PLC_Bit, plc
-    bit_plc.place(x=120, y= 50, anchor='center')
-    boton_desactivar.place(x=65, y= 110, anchor='w')
-    boton_activar.place(x=175, y= 110, anchor='e')
+    bit_plc.place(x=90, y= 50, anchor='center')
+    boton_desactivar.place(x=35, y= 110, anchor='w')
+    boton_activar.place(x=145, y= 110, anchor='e')
     
     actualizar_bit()
 
@@ -90,6 +90,7 @@ def obtener_texto():
 PLC_Byte = PLC_Bit = step = 0
 after_id = 0
 root = tk.Tk()
+root.geometry('{}x{}'.format(180, 160))
 entrada = tk.Entry(root)
 boton = tk.Button(root, text="Enter", command=obtener_texto)
 texto = tk.Label(root, text="Which PLC?")
