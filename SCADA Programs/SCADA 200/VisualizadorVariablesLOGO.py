@@ -1,6 +1,7 @@
 import tkinter as tk
 import configparser
 import PLC_Updater
+import Connection_Ok as ts
 import time
 
 def create_bit_squares(plc_num):
@@ -55,15 +56,24 @@ def create_bit_squares(plc_num):
     back_button.grid(row=0, column=8, columnspan=2, pady=10)
 
 def create_PLC_squares():
+    global after_id_2
     PLC_frame.grid()
     for i in range(PLC_count):
-        PLC_square = tk.Canvas(PLC_frame, width=square_size, height=square_size, bg='blue')
+        bg_selector = ts.try_to_connect(f'192.168.30.{i+101}',0,1)
+        if bg_selector==True:
+            bg_selector = "Green"
+        else:
+            bg_selector = "Red"
+        PLC_square = tk.Canvas(PLC_frame, width=square_size, height=square_size, bg=bg_selector)
         PLC_square.create_text(square_size // 2, square_size // 2, text=f'PLC {i+1}', fill='white')
         PLC_square.bind('<Button-1>', lambda event, plc_num=i: on_square_click(plc_num))
         PLC_square.grid(row=i//(int(config.get('Settings', 'distributionX'))), column=i%(int(config.get('Settings', 'distributionY'))), padx=5, pady=5)
-        PLC_Squares.append(PLC_square)  
+        PLC_Squares.append(PLC_square) 
+        if i==PLC_count-1:
+            after_id_2 = window.after(2500, create_PLC_squares)     
 
 def on_square_click(plc_num):
+    window.after_cancel(after_id_2) 
     PLC_frame.grid_forget()
     Bit_frame.grid()
     create_bit_squares(plc_num)
@@ -80,7 +90,7 @@ def on_back_button_click(after_id):
 
 
 config = configparser.ConfigParser()
-config.read(r'SCADA Programs\SCADA 200\config.ini')
+config.read(r'C:\Users\alber\Documents\Snap-7-Projects\SCADA Programs\SCADA 200\config.ini')
 square_size = int(config.get('Settings', 'square_size'))
 PLC_count = int(config.get('Settings', 'PLC_count'))
 bytes_in_read = int(config.get('Settings', 'bytes_in_read'))
@@ -95,6 +105,7 @@ PLC_Squares = []
 Bit_Squares = []
 bit_squares_created = False
 after_id = None
+after_id_2 = None
 create_PLC_squares()
    
 window.mainloop()

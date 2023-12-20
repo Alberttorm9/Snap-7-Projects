@@ -1,7 +1,7 @@
 import snap7
 import configparser
 config = configparser.ConfigParser()
-config.read('SCADA Programs\SCADA 200\config.ini')
+config.read(r'C:\Users\alber\Documents\Snap-7-Projects\SCADA Programs\SCADA 200\config.ini')
 PLC_count = int(config.get('Settings', 'PLC_count'))
 bytes_in_read = int(config.get('Settings', 'bytes_in_read'))
 bytes_out_read = int(config.get('Settings', 'bytes_out_read'))
