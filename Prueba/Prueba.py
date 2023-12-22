@@ -1,26 +1,33 @@
-import snap7
-import time
-import Tools as ts
 import tkinter as tk
 
-plc = snap7.logo.Logo()
-
-# Crear la ventana
+# Crear la ventana principal
 root = tk.Tk()
-PLC_Byte = PLC_Bit = 1
-# Crear un frame para contener los elementos
+root.title("Cuadrícula en el centro de la pantalla")
+
+# Definir el tamaño de la pantalla
+screen_width = 1920
+screen_height = 1080
+
+# Definir el tamaño de la cuadrícula
+grid_width = 5
+grid_height = 5
+
+# Crear un frame para contener la cuadrícula
 frame = tk.Frame(root)
-frame.pack()
+frame.pack(expand=True)
 
-# Crear un cuadrado de color verde en el centro del frame
-cuadrado = tk.Label(frame, width=10, height=5, bg="green")
-cuadrado.pack(pady=10)
-ip = f'192.168.30.101'
-plc = ts.try_to_connect(ip, 0, 1)
-plc.write(f'V{PLC_Byte}.{PLC_Bit}',1)
-# Crear botones para cambiar el color del cuadrado
-boton_rojo = tk.Button(root, text="Activar", command=lambda:plc.write(f'V{PLC_Byte}.{PLC_Bit}',1))
-boton_rojo.pack(side=tk.RIGHT, padx=5)
+# Calcular las coordenadas para el centro de la pantalla
+x_center = screen_width // 2
+y_center = screen_height // 2
 
-# Mostrar la ventana
+# Crear y posicionar los widgets en la cuadrícula
+for i in range(grid_height):
+    for j in range(grid_width):
+        label = tk.Label(frame, text=f"({i},{j})", borderwidth=1, relief="solid", width=10, height=2)
+        label.grid(row=i, column=j)
+
+# Posicionar la cuadrícula en el centro de la ventana
+frame.grid(row=0, column=0, padx=(x_center - (grid_width*100)//2), pady=(y_center - (grid_height*50)//2))
+
+# Ejecutar la aplicación
 root.mainloop()

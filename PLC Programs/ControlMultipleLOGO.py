@@ -11,9 +11,9 @@ import time
 #V10.6 = Forzar Alimentación (Negado) ---------- V12.6 = Alimentación
 # ---------- V12.7 = Fallo alimentacion garaje
 
-pulsador_portal = "V10.1"
-portal_cerrado = "V12.2"
-portal_abierto = "V12.3"
+pulsador_portal = "V8.4"
+portal_cerrado = "V0.3"
+portal_abierto = "V0.4"
 
 cantidad_de_habitaciones = 40
 numero_fallidos = 0
