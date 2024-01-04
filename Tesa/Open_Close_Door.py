@@ -6,7 +6,7 @@ import re
 import customtkinter as ctk
 
 config = configparser.ConfigParser()
-config.read('Tesa\Config.ini')
+config.read('Config.ini')
 print(config.get('Tesa', 'IP'))
 def show_loggin():
     entry_username.delete(0, 'end')
