@@ -3,11 +3,9 @@ from tkinter import messagebox
 import requests
 import configparser
 import re
-import customtkinter as ctk
 
 config = configparser.ConfigParser()
 config.read('Config.ini')
-print(config.get('Tesa', 'IP'))
 def show_loggin():
     entry_username.delete(0, 'end')
     entry_password.delete(0, 'end')
@@ -26,8 +24,8 @@ def login(event):
     username = entry_username.get()
     password = entry_password.get()
 
-    # Verificar las credenciales (aquí puedes agregar tu lógica de autenticación)
-    if username == "XXX" and password == "XXX":
+    # Login
+    if username == "XXXXXX" and password == "XXXXXX":
         frame_loggin.grid_forget()
         show_door_selection()
     else:
@@ -64,10 +62,10 @@ def open_door():
     <soap:doorOpen>
     <operatorName>{}</operatorName>
     <operatorPassword>{}</operatorPassword>
-    <doorName>{}</doorName>
+    <doorId>{}</doorId>
     </soap:doorOpen>
     </soapenv:Body>
-    </soapenv:Envelope>"
+    </soapenv:Envelope>
     """.format(entry_username.get(), entry_password.get(),entry_door.get())
     url = f"https://{host}:8181/TesaHotelPlatform/{service}"   
     headers = {'Content-Type': 'text/xml'}
@@ -76,15 +74,17 @@ def open_door():
     except Exception:
         messagebox.showerror("Error", "Is the ip well configured?")
     if response.status_code == 200:
-        response_shown = re.search(r'<errorType>(.*?)</errorType>', str(response.content))
-        messagebox.showinfo("Éxito", response_shown.group(1))
+        try:
+            response_shown = re.search(r'<errorType>(.*?)</errorType>', str(response.content))
+            messagebox.showerror("Error", response_shown.group(1))
+        except Exception:
+            response_shown = re.search(r'<type>(.*?)</type>', str(response.content))
+            messagebox.showinfo("Éxito", "Puerta Abierta Correctamente")
         print(response.content)
-        return response.content
     else:
         response_shown = re.search(r'<errorType>(.*?)</errorType>', str(response.text))
         messagebox.showinfo("Error", response_shown.group(1))
         print(response.text)
-        return None, response.text
 
 def close_door():
     host = config.get('Tesa', 'IP')
@@ -96,7 +96,7 @@ def close_door():
     <soap:doorClose>
     <operatorName>{}</operatorName>
     <operatorPassword>{}</operatorPassword>
-    <doorName>{}</doorName>
+    <doorId>{}</doorId>
     </soap:doorClose>
     </soapenv:Body>
     </soapenv:Envelope>
@@ -110,15 +110,17 @@ def close_door():
     except Exception:
         messagebox.showerror("Error", "Is the ip well configured?")
     if response.status_code == 200:
-        response_shown = re.search(r'<errorType>(.*?)</errorType>', str(response.content))
-        messagebox.showinfo("Éxito", response_shown.group(1))
+        try:
+            response_shown = re.search(r'<errorType>(.*?)</errorType>', str(response.content))
+            messagebox.showerror("Error", response_shown.group(1))
+        except Exception:
+            response_shown = re.search(r'<type>(.*?)</type>', str(response.content))
+            messagebox.showinfo("Éxito", "Puerta Cerrada Correctamente")
         print(response.content)
-        return response.content
     else:
         response_shown = re.search(r'<errorType>(.*?)</errorType>', str(response.text))
         messagebox.showinfo("Error", response_shown.group(1))
         print(response.text)
-        return None, response.text
 
 
 # Crear la ventana principal
@@ -142,9 +144,9 @@ button_go_selected_door = tk.Button(frame_door_selection, text="Enter", command=
 button_logout = tk.Button(frame_door_selection, text="Cerrar Sesion", command=show_loggin)
 
 label_door_selected = tk.Label(frame_door_selected, text="")
-button_open = ctk.CTkButton(frame_door_selected, text="Abrir", command=open_door)
-button_close = ctk.CTkButton(frame_door_selected, text="Cerrar", command=close_door)
-button_go_back = ctk.CTkButton(frame_door_selected, text="Atras", command=show_door_selection)
+button_open = tk.Button(frame_door_selected, text="Abrir", command=open_door)
+button_close = tk.Button(frame_door_selected, text="Cerrar", command=close_door)
+button_go_back = tk.Button(frame_door_selected, text="Atras", command=show_door_selection)
 
 
 # Ejecutar la aplicación
