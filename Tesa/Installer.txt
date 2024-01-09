@@ -1,0 +1,4 @@
+On cmd:
+pyinstaller --onefile --add-data "config.ini;." --add-data "x_button.png;." --add-data "Open_Lock.png;." Open_Door_With_Interface.py
+
+Copy the config.ini and de png used on dist folder where .exe is located
