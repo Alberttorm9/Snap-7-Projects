@@ -1,8 +1,9 @@
 import tkinter as tk
+from PIL import ImageTk, Image
 import configparser
 import PLC_Updater
 import Connection_Ok as ts
-import time
+import os
 
 def create_bit_squares(plc_num):
     global bit_squares_created, after_id
@@ -64,8 +65,7 @@ def create_PLC_squares():
             bg_selector = "Green"
         else:
             bg_selector = "Red"
-        PLC_square = tk.Canvas(PLC_frame, width=square_size, height=square_size, bg=bg_selector)
-        PLC_square.create_text(square_size // 2, square_size // 2, text=f'PLC {i+1}', fill='white')
+        PLC_square = tk.Label(PLC_frame, width=square_size, height=square_size, image=image_PLC)
         PLC_square.bind('<Button-1>', lambda event, plc_num=i: on_square_click(plc_num))
         PLC_square.grid(row=i//(int(config.get('Settings', 'distributionX'))), column=i%(int(config.get('Settings', 'distributionY'))), padx=5, pady=5)
         PLC_Squares.append(PLC_square) 
@@ -80,7 +80,8 @@ def on_square_click(plc_num):
 
 def on_back_button_click(after_id):
     global bit_squares_created, Bit_frame
-    window.after_cancel(after_id)
+    if after_id is not None:
+        window.after_cancel(after_id)
     Bit_Squares.clear()
     bit_squares_created = False
     Bit_frame.grid_forget()
@@ -90,14 +91,14 @@ def on_back_button_click(after_id):
 
 
 config = configparser.ConfigParser()
-config.read(r'C:\Users\alber\Documents\Snap-7-Projects\SCADA Programs\SCADA 200\config.ini')
+config.read('config.ini')
 square_size = int(config.get('Settings', 'square_size'))
 PLC_count = int(config.get('Settings', 'PLC_count'))
 bytes_in_read = int(config.get('Settings', 'bytes_in_read'))
 bytes_out_read = int(config.get('Settings', 'bytes_out_read'))
 PLC_count = int(config.get('Settings', 'PLC_count'))
 window = tk.Tk()
-window.title("Programa de Cuadrados")
+window.title("SCADA")
 PLC_frame = tk.Frame(window, bg='lightblue')
 Bit_frame = tk.Frame(window, bg='lightgreen')
 back_button = tk.Button(window, text='Atrás', command=on_back_button_click)
@@ -106,6 +107,13 @@ Bit_Squares = []
 bit_squares_created = False
 after_id = None
 after_id_2 = None
+
+
+#Image src
+imagen = Image.open("Logo-icono.png")
+imagen = imagen.resize((90, 90))
+image_PLC = ImageTk.PhotoImage(imagen)
+
 create_PLC_squares()
    
 window.mainloop()
