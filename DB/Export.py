@@ -12,7 +12,7 @@ conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database
 
 def exportar_informacion(tabla, desde, hasta):
     cursor = conn.cursor()
-    query = "SELECT * FROM {} WHERE Time_Stamp >= ? AND Time_Stamp <= ?".format(tabla)
+    query = "SELECT * FROM {} WHERE Time_Stamp BETWEN ? AND Time_Stamp BETWEN ?".format(tabla)
     cursor.execute(query, desde, hasta)
     rows = cursor.fetchall()
 
