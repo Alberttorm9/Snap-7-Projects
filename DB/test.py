@@ -1,32 +1,46 @@
-import tkinter as tk
-from tkinter import ttk
+import pandas as pd
+import os
+import pyodbc
+from datetime import datetime
+import re
+import openpyxl
+from openpyxl.styles import Font
 
-root = tk.Tk()
-root.geometry('800x800')
-root.title('Exportaciones')
-
-window_width = 800
-window_height = 800
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-x_coordinate = int((screen_width / 2) - (window_width / 2))
-y_coordinate = int((screen_height / 2) - (window_height / 2))
-root.geometry(f'{window_width}x{window_height}+{x_coordinate}+{y_coordinate}')
-
-style = ttk.Style()
-style.configure('Custom.TButton', font=('Helvetica', 12), padding=10)
-
-frame_exportaciones = ttk.Frame(root)
-frame_exportaciones.place(relx=0.5, rely=0.5, anchor='center')
-
-open_frame_reportes = ttk.Button(frame_exportaciones, text="Exportar Reportes", style='Custom.TButton')
-open_frame_reportes.grid(row=0, column=0, padx=10, pady=10)
-
-open_frame_exit = ttk.Button(frame_exportaciones, text="Exportar Salidas Del Sistema", style='Custom.TButton')
-open_frame_exit.grid(row=0, column=1, padx=10, pady=10)
-
-open_frame_habs = ttk.Button(frame_exportaciones, text="Exportar Limpieza Habitaciones", style='Custom.TButton')
-open_frame_habs.grid(row=0, column=2, padx=10, pady=10)
+tabla = "Reportes"
+server = 'LAPTOP-3UQV2BFJ\\SQLEXPRESS' 
+database = 'Motel_Panamá' 
+conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';Trusted_Connection=yes')
+cursor = conn.cursor()
+query = f"SELECT Reportes_Texto_Reporte, Reportes_Hora_Reporte, Reportes_Numero_Reporte, Reportes_Hora_Real_Reporte, Reportes_Numero_Real_Reporte FROM {tabla} WHERE Time_Stamp BETWEEN '2024-01-24' AND '2024-01-27'"
+carpeta_exports = 'Exports\Reportes'
+encabezados = ['Texto Del Reporte', 'Hora Del Reporte', 'Numero Del Reporte', 'Hora Real Del Reporte', 'Numero Real Del Reporte']
+print(query + "\n\n")
+cursor.execute(query)
+rows = cursor.fetchall()
+rows = [(re.sub(r"[\(\)]", "", item) if isinstance(item, str) else item) for row in rows for item in row]
 
 
-root.mainloop()
+if not os.path.exists(carpeta_exports):
+    os.makedirs(carpeta_exports)
+
+
+wb = openpyxl.Workbook()
+sheet = wb.active
+
+# Agregar encabezados en negrita
+for col, encabezado in enumerate(encabezados, 1):
+    sheet.cell(row=1, column=col, value=encabezado)
+    sheet.cell(row=1, column=col).font = Font(bold=True)
+
+x=0
+y=1
+for col, rowData in enumerate(rows, 1):
+    sheet.cell(row=x+2, column=y, value=rowData)
+    y=y+1
+    if col==5:
+        x=x+1
+        y=1
+    
+
+# Guardar el archivo
+wb.save('export.xlsx')

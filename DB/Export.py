@@ -1,12 +1,14 @@
 import tkinter as tk
 from tkinter import ttk, PhotoImage
 import pyodbc
-import csv
+import pandas as pd
 import os
 import re
 import sys
 import configparser
 from datetime import datetime
+import openpyxl
+from openpyxl.styles import Font
 
 #Configparser
 config = configparser.ConfigParser()
@@ -24,31 +26,50 @@ conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database
 def export_Info(tabla, desde, hasta, type):
     cursor = conn.cursor()
     if type=="Reports":
-        query = f"SELECT Reportes_Texto_Reporte,Reportes_Hora_Reporte,Reportes_Numero_Reporte,Reportes_Hora_Real_Reporte,Reportes_Numero_Real_Reporte FROM {tabla} WHERE Time_Stamp BETWEEN '{desde}' AND '{hasta}'"
-        carpeta_exports = fr'{str(config["RUTA"]["REPORTES"])}'
-        encabezados = ['Texto Del Reporte','Hora Del Reporte','Numero Del Reporte','Hora Real Del Reporte','Numero Real Del Reporte']
+        query = f"SELECT Reportes_Texto_Reporte, Reportes_Hora_Reporte, Reportes_Numero_Reporte, Reportes_Hora_Real_Reporte, Reportes_Numero_Real_Reporte FROM {tabla} WHERE Time_Stamp BETWEEN '{desde}' AND '{hasta}'"
+        carpeta_exports = str(config["RUTA"]["REPORTES"])
+        encabezados = ('Texto Del Reporte', 'Hora Del Reporte', 'Numero Del Reporte', 'Hora Real Del Reporte', 'Numero Real Del Reporte')
+        CantidadValores = 5
     elif type =="Exits":
-        query = f"SELECT Now_Local,sys_On_Off FROM {tabla} WHERE Time_Stamp BETWEEN '{desde}' AND '{hasta}'"
-        carpeta_exports = fr'{str(config["RUTA"]["SALIDAS"])}'
-        encabezados = ['Hora De Accion','Tipo De Accion']
+        query = f"SELECT Now_Local, sys_On_Off FROM {tabla} WHERE Time_Stamp BETWEEN '{desde}' AND '{hasta}'"
+        carpeta_exports = str(config["RUTA"]["SALIDAS"])
+        encabezados = ['Hora De Accion', 'Tipo De Accion']
+        CantidadValores = 2
     elif type=="Habs":
         NumeroHab = re.findall(r'\d+', tabla)  # Encuentra todos los dígitos en la cadena de texto
-        query = f"SELECT Time_Stamp,Hab_{int(NumeroHab[0])-1}_Tiempo_Limpiando FROM {tabla} WHERE Time_Stamp BETWEEN '{desde}' AND '{hasta}'"
-        carpeta_exports = fr'{str(config["RUTA"]["HABITACIONES"])}'
-        encabezados = ['Hora Terminada',f'Tiempo Limpiando Habitación {int(NumeroHab[0])}']
-    print(query+"\n\n")
+        query = f"SELECT Time_Stamp, Hab_{int(NumeroHab[0])-1}_Tiempo_Limpiando FROM {tabla} WHERE Time_Stamp BETWEEN '{desde}' AND '{hasta}'"
+        carpeta_exports = str(config["RUTA"]["HABITACIONES"])
+        encabezados = ['Hora Terminada', f'Tiempo Limpiando Habitación {int(NumeroHab[0])}']
+        CantidadValores = 2
+
+    print(query + "\n\n")
     cursor.execute(query)
     rows = cursor.fetchall()
-    
+    rows = [(re.sub(r"[\(\)]", "", item) if isinstance(item, str) else item) for row in rows for item in row]
+
     if not os.path.exists(carpeta_exports):
         os.makedirs(carpeta_exports)
-    
-    archivo_csv = os.path.join(carpeta_exports, '{} {}.csv'.format(tabla,datetime.now().strftime('%d-%m-%y')))
-    with open(archivo_csv, 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file, delimiter='\t')
-        writer = csv.writer(file)
-        writer.writerow(encabezados)  # Escribir los encabezados personalizados en la primera línea
-        writer.writerows(rows)
+
+
+    exportar_excel(rows, encabezados, CantidadValores, carpeta_exports, tabla)
+
+def exportar_excel(rows, encabezados,CantidadValores, carpeta_exports, tabla):
+    wb = openpyxl.Workbook()
+    sheet = wb.active
+    #Encabezado
+    for col, encabezado in enumerate(encabezados, 1):
+        sheet.cell(row=1, column=col, value=encabezado)
+        sheet.cell(row=1, column=col).font = Font(bold=True)
+    #Lineas
+    x=0
+    y=0
+    for col, rowData in enumerate(rows, 1):
+        y=y+1
+        sheet.cell(row=x+2, column=y, value=rowData)
+        if col % CantidadValores == 0:
+            x=x+1
+            y=0
+    wb.save(f'{carpeta_exports}\{tabla} {datetime.now().strftime("%d-%m-%y")}.xlsx')
 
 def set_actual_date():
     ActualDate= datetime.now().strftime('%Y-%m-%d')
