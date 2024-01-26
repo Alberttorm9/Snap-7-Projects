@@ -232,3 +232,14 @@ ExportButtonHabs.grid(row=4, columnspan=6)
 #####################################################################################################################################################
 
 root.mainloop()
+
+
+
+
+
+
+
+
+
+
+#Hay que poner que coja el dia "hasta:" porque ahora coge solo hasta el dia anterior a ese
