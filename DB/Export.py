@@ -1,7 +1,7 @@
 import tkinter as tk
-from tkinter import ttk, PhotoImage
+from tkinter import ttk, PhotoImage, Tk, Frame, Label
+from PIL import Image, ImageTk
 import pyodbc
-import pandas as pd
 import os
 import re
 import sys
@@ -26,18 +26,18 @@ conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database
 def export_Info(tabla, desde, hasta, type):
     cursor = conn.cursor()
     if type=="Reports":
-        query = f"SELECT Reportes_Texto_Reporte, Reportes_Hora_Reporte, Reportes_Numero_Reporte, Reportes_Hora_Real_Reporte, Reportes_Numero_Real_Reporte FROM {tabla} WHERE Time_Stamp BETWEEN '{desde}' AND '{hasta}'"
+        query = f"SELECT Reportes_Texto_Reporte, Reportes_Hora_Reporte, Reportes_Numero_Reporte, Reportes_Hora_Real_Reporte, Reportes_Numero_Real_Reporte FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
         carpeta_exports = str(config["RUTA"]["REPORTES"])
         encabezados = ('Texto Del Reporte', 'Hora Del Reporte', 'Numero Del Reporte', 'Hora Real Del Reporte', 'Numero Real Del Reporte')
         CantidadValores = 5
     elif type =="Exits":
-        query = f"SELECT Now_Local, sys_On_Off FROM {tabla} WHERE Time_Stamp BETWEEN '{desde}' AND '{hasta}'"
+        query = f"SELECT Now_Local, sys_On_Off FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
         carpeta_exports = str(config["RUTA"]["SALIDAS"])
         encabezados = ['Hora De Accion', 'Tipo De Accion']
         CantidadValores = 2
     elif type=="Habs":
         NumeroHab = re.findall(r'\d+', tabla)  # Encuentra todos los dígitos en la cadena de texto
-        query = f"SELECT Time_Stamp, Hab_{int(NumeroHab[0])-1}_Tiempo_Limpiando FROM {tabla} WHERE Time_Stamp BETWEEN '{desde}' AND '{hasta}'"
+        query = f"SELECT Time_Stamp, Hab_{int(NumeroHab[0])-1}_Tiempo_Limpiando FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
         carpeta_exports = str(config["RUTA"]["HABITACIONES"])
         encabezados = ['Hora Terminada', f'Tiempo Limpiando Habitación {int(NumeroHab[0])}']
         CantidadValores = 2
@@ -124,16 +124,23 @@ def show_Habs():
 # Interfaz de usuario
 root = tk.Tk()
 root.title("Exportar Información")
+imagen_fondo = Image.open("fondo.png")
+imagen_fondo = ImageTk.PhotoImage(imagen_fondo)
+etiqueta_fondo = Label(root, image=imagen_fondo)
+etiqueta_fondo.place(x=0, y=0, relwidth=1, relheight=1)
 
 #TkStyle
 Tkstyle = ttk.Style()
 Tkstyle.configure('Custom.TButton', font=('Helvetica', 12), padding=10)
-
+Tkstyle.configure('Title.TLabel', font=('Arial', 14, 'bold'))
+Tkstyle.configure('Invisible.TButton', borderwidth=0, borderheight=0, highlightthickness=0, relief="flat")
 #Frames
 FrameExportaciones = tk.Frame(root, width=int(ScreenWidth/2), height=int(ScreenHeight/2))
 FrameExportReports = tk.Frame(root)
 FrameExportExit = tk.Frame(root)
 FrameExportHabs = tk.Frame(root)
+
+
 
 #Scree Gometry
 ScreeGometry = f'{ScreenWidth}x{ScreenHeight}+{int((root.winfo_screenwidth() / 2) - (ScreenWidth / 2))}+{int((root.winfo_screenheight() / 2) - (ScreenHeight / 2))}'
@@ -148,7 +155,7 @@ SysCloseButton.place(relx=1, x=0, y=0, anchor='ne')
 
 #Go Back
 back_phooto = PhotoImage(file=os.path.abspath("Back_Button.png"))
-GoBackButton = tk.Button(root, image=back_phooto, borderwidth=0, highlightthickness=0,  command=GoBack)
+GoBackButton = ttk.Button(root, image=back_phooto, style='Invisible.TButton',command=GoBack)
 
 #Initial Frame
 FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
@@ -158,22 +165,26 @@ FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
 #Open Reports
 OpenFrameReportes = ttk.Button(FrameExportaciones, text="Exportar Reportes", command=show_Reports, style='Custom.TButton')
 OpenFrameReportes.grid(row=1, column=0, padx=10, pady=10)
+
 #To Frame Reports
+LabelReports = ttk.Label(FrameExportReports, text="Exportador Tabla Reportes", style='Title.TLabel')
+LabelReports.grid(row=0, columnspan=3, pady=5)
+
 FromLabelReports = ttk.Label(FrameExportReports, text="Desde:")
-FromLabelReports.grid(row=1, column=1)
+FromLabelReports.grid(row=1, column=0)
 FromEntryReports = ttk.Entry(FrameExportReports)
-FromEntryReports.grid(row=1, column=2)
+FromEntryReports.grid(row=1, column=1)
 
 ToLabelReports = ttk.Label(FrameExportReports, text="Hasta:")
-ToLabelReports.grid(row=2, column=1)
+ToLabelReports.grid(row=2, column=0)
 ToEntryReports = ttk.Entry(FrameExportReports)
-ToEntryReports.grid(row=2, column=2)
+ToEntryReports.grid(row=2, column=1)
 
 ActualDateButtonReports = ttk.Button(FrameExportReports, text="Fecha actual", command=set_actual_date)
-ActualDateButtonReports.grid(row=2, column=3)
+ActualDateButtonReports.grid(row=2, column=2)
 
 ExportButtonReports = ttk.Button(FrameExportReports, text="Exportar", command=lambda:export(str("Reports")))
-ExportButtonReports.grid(row=3, columnspan=3)
+ExportButtonReports.grid(row=3, columnspan=2)
 
 #####################################################################################################################################################
 
@@ -232,14 +243,3 @@ ExportButtonHabs.grid(row=4, columnspan=6)
 #####################################################################################################################################################
 
 root.mainloop()
-
-
-
-
-
-
-
-
-
-
-#Hay que poner que coja el dia "hasta:" porque ahora coge solo hasta el dia anterior a ese
