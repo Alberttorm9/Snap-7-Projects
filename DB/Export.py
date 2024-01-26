@@ -69,6 +69,7 @@ def exportar_excel(rows, encabezados,CantidadValores, carpeta_exports, tabla):
         if col % CantidadValores == 0:
             x=x+1
             y=0
+
     wb.save(f'{carpeta_exports}\{tabla} {datetime.now().strftime("%d-%m-%y")}.xlsx')
 
 def set_actual_date():
@@ -97,20 +98,27 @@ def export(type):
     
     export_Info(table, since, till, type)
 
-
-
+def GoBack():
+    GoBackButton.place_forget()
+    FrameExportReports.place_forget()
+    FrameExportExit.place_forget()
+    FrameExportHabs.place_forget()
+    FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
 
 def show_Reports():
     FrameExportaciones.place_forget()
     FrameExportReports.place(relx=0.5, rely=0.5, anchor='center')
+    GoBackButton.place(relx=0, x=0, y=0, anchor='nw')
 
 def show_Exit():
     FrameExportaciones.place_forget()
     FrameExportExit.place(relx=0.5, rely=0.5, anchor='center')
+    GoBackButton.place(relx=0, x=0, y=0, anchor='nw')
 
 def show_Habs():
     FrameExportaciones.place_forget()
     FrameExportHabs.place(relx=0.5, rely=0.5, anchor='center')
+    GoBackButton.place(relx=0, x=0, y=0, anchor='nw')
 
 
 # Interfaz de usuario
@@ -135,9 +143,12 @@ root.attributes("-topmost", True)
 
 #Close App
 x_photo = PhotoImage(file=os.path.abspath("x_button.png"))
-SysCloseButton = tk.Button(root, bg='lightgrey', image=x_photo, borderwidth=0, highlightthickness=0,  command=sys.exit)
+SysCloseButton = tk.Button(root, image=x_photo, borderwidth=0, highlightthickness=0,  command=sys.exit)
 SysCloseButton.place(relx=1, x=0, y=0, anchor='ne')
 
+#Go Back
+back_phooto = PhotoImage(file=os.path.abspath("Back_Button.png"))
+GoBackButton = tk.Button(root, image=back_phooto, borderwidth=0, highlightthickness=0,  command=GoBack)
 
 #Initial Frame
 FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
