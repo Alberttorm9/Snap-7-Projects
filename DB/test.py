@@ -1,46 +1,53 @@
-import pandas as pd
-import os
-import pyodbc
-from datetime import datetime
-import re
-import openpyxl
-from openpyxl.styles import Font
+import tkinter as tk
 
-tabla = "Reportes"
-server = 'LAPTOP-3UQV2BFJ\\SQLEXPRESS' 
-database = 'Motel_Panamá' 
-conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';Trusted_Connection=yes')
-cursor = conn.cursor()
-query = f"SELECT Reportes_Texto_Reporte, Reportes_Hora_Reporte, Reportes_Numero_Reporte, Reportes_Hora_Real_Reporte, Reportes_Numero_Real_Reporte FROM {tabla} WHERE Time_Stamp BETWEEN '2024-01-24' AND '2024-01-27'"
-carpeta_exports = 'Exports\Reportes'
-encabezados = ['Texto Del Reporte', 'Hora Del Reporte', 'Numero Del Reporte', 'Hora Real Del Reporte', 'Numero Real Del Reporte']
-print(query + "\n\n")
-cursor.execute(query)
-rows = cursor.fetchall()
-rows = [(re.sub(r"[\(\)]", "", item) if isinstance(item, str) else item) for row in rows for item in row]
+class Calculadora:
+    def __init__(self, ventana):
+        self.ventana = ventana
+        self.ventana.title("Calculadora")
 
+        self.entrada = tk.Entry(ventana, width=20, font=("Arial", 16))
+        self.entrada.grid(row=0, column=0, columnspan=4)
 
-if not os.path.exists(carpeta_exports):
-    os.makedirs(carpeta_exports)
+        botones = [
+            '7', '8', '9', '/',
+            '4', '5', '6', '*',
+            '1', '2', '3', '-',
+            '0', 'C', '=', '+'
+        ]
 
+        fila = 1
+        columna = 0
+        for boton_texto in botones:
+            if boton_texto == '=':
+                boton = tk.Button(ventana, text=boton_texto, width=10, command=self.calcular)
+            elif boton_texto == 'C':
+                boton = tk.Button(ventana, text=boton_texto, width=10, command=self.limpiar)
+            else:
+                boton = tk.Button(ventana, text=boton_texto, width=5, command=lambda texto=boton_texto: self.anadir_texto(texto))
+            boton.grid(row=fila, column=columna)
+            columna += 1
+            if columna > 3:
+                columna = 0
+                fila += 1
 
-wb = openpyxl.Workbook()
-sheet = wb.active
+    def anadir_texto(self, texto):
+        self.entrada.insert(tk.END, texto)
 
-# Agregar encabezados en negrita
-for col, encabezado in enumerate(encabezados, 1):
-    sheet.cell(row=1, column=col, value=encabezado)
-    sheet.cell(row=1, column=col).font = Font(bold=True)
+    def limpiar(self):
+        self.entrada.delete(0, tk.END)
 
-x=0
-y=1
-for col, rowData in enumerate(rows, 1):
-    sheet.cell(row=x+2, column=y, value=rowData)
-    y=y+1
-    if col==5:
-        x=x+1
-        y=1
-    
+    def calcular(self):
+        try:
+            resultado = eval(self.entrada.get())
+            self.entrada.delete(0, tk.END)
+            self.entrada.insert(tk.END, str(resultado))
+        except:
+            self.entrada.delete(0, tk.END)
+            self.entrada.insert(tk.END, "Error")
 
-# Guardar el archivo
-wb.save('export.xlsx')
+# Crear ventana
+ventana = tk.Tk()
+mi_calculadora = Calculadora(ventana)
+
+# Ejecutar ventana
+ventana.mainloop()

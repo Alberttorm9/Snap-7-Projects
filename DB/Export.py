@@ -92,16 +92,19 @@ def export_month(type):
         FromEntryReports.insert(0, first_day_of_month)
         ToEntryReports.delete(0, 'end')
         ToEntryReports.insert(0, ActualDate)
+        export(type)
     elif type=="Exits":
         FromEntryExits.delete(0, 'end')
         FromEntryExits.insert(0, first_day_of_month)
         ToEntryExits.delete(0, 'end')
         ToEntryExits.insert(0, ActualDate)
+        export(type)
     elif type=="Habs":
         FromEntryHabs.delete(0, 'end')
         FromEntryHabs.insert(0, first_day_of_month)
         ToEntryHabs.delete(0, 'end')
         ToEntryHabs.insert(0, ActualDate)
+        export(type)
 
 def export_day(type):
     ActualDate= datetime.now().strftime('%Y-%m-%d')
@@ -112,16 +115,19 @@ def export_day(type):
         FromEntryReports.insert(0, yesterday)
         ToEntryReports.delete(0, 'end')
         ToEntryReports.insert(0, ActualDate)
+        export(type)
     elif type=="Exits":
         FromEntryExits.delete(0, 'end')
         FromEntryExits.insert(0, yesterday)
         ToEntryExits.delete(0, 'end')
         ToEntryExits.insert(0, ActualDate)
+        export(type)
     elif type=="Habs":
         FromEntryHabs.delete(0, 'end')
         FromEntryHabs.insert(0, yesterday)
         ToEntryHabs.delete(0, 'end')
         ToEntryHabs.insert(0, ActualDate)
+        export(type)
         
 
 def export(type):
@@ -192,6 +198,8 @@ root.geometry(ScreeGometry)
 root.overrideredirect(True)
 root.attributes("-topmost", True)
 
+#####################################################################################################################################################
+
 #Close App
 x_photo = PhotoImage(file=os.path.abspath("x_button.png"))
 SysCloseButton = tk.Button(root, image=x_photo, borderwidth=0, bg= '#505050', command=sys.exit)
@@ -200,6 +208,8 @@ SysCloseButton.place(relx=1, x=0, y=0, anchor='ne')
 #Go Back
 back_phooto = PhotoImage(file=os.path.abspath("Back_Button.png"))
 GoBackButton = tk.Button(root, image=back_phooto, borderwidth=0, bg= '#505050', command=GoBack)
+
+#####################################################################################################################################################
 
 #Initial Frame
 FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
