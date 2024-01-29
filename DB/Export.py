@@ -232,7 +232,7 @@ FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
 #####################################################################################################################################################
 
 #Open Reports
-OpenFrameReportes = ctk.CTkButton(FrameExportaciones, text="Exportar Reportes", command=show_Reports, font=("Arial", 40))
+OpenFrameReportes = ctk.CTkButton(FrameExportaciones, text="Exportar Reportes", command=show_Reports)
 OpenFrameReportes.grid(row=1, column=0, padx=10, pady=10)
 
 #To Frame Reports
@@ -251,7 +251,7 @@ ToEntryReports.grid(row=2, column=1)
 
 #Aplicate Actual Date
 ActualDateButtonReports = ctk.CTkButton(FrameExportReports, text="Fecha actual", border_width=1, command=lambda:set_actual_date(str("Reports")))
-ActualDateButtonReports.grid(row=2, column=2)
+ActualDateButtonReports.grid(row=2, column=2, padx=5)
 
 #Export day
 ExportLastDayReportes = ctk.CTkButton(FrameExportReports, text="Exportar Último Dia", command=lambda:export_time(0, (str("Reports"))))
@@ -290,12 +290,12 @@ ActualDateButtonExits = ctk.CTkButton(FrameExportExit, text="Fecha actual", bord
 ActualDateButtonExits.grid(row=2, column=2)
 
 #Export day
-ExportLastDayReportes = ctk.CTkButton(FrameExportExit, text="Exportar Último Dia", command=lambda:export_time(0, (str("Exits"))))
-ExportLastDayReportes.grid(row=1, column=4, padx=5, pady=2)
+ExportLastDayExits = ctk.CTkButton(FrameExportExit, text="Exportar Último Dia", command=lambda:export_time(0, (str("Exits"))))
+ExportLastDayExits.grid(row=1, column=4, padx=5, pady=2)
 
 #Export month
-ExportLastMonthReportes = ctk.CTkButton(FrameExportExit, text="Exportar Último Mes", command=lambda:export_time(1, (str("Exits"))))
-ExportLastMonthReportes.grid(row=2, column=4, padx=5, pady=2)
+ExportLastMonthExits = ctk.CTkButton(FrameExportExit, text="Exportar Último Mes", command=lambda:export_time(1, (str("Exits"))))
+ExportLastMonthExits.grid(row=2, column=4, padx=5, pady=2)
 
 #Export
 ExportButtonExits = ctk.CTkButton(FrameExportExit, text="Exportar", command=lambda:export(str("Exits")))
@@ -331,16 +331,16 @@ ToEntryHabs = tk.Entry(FrameExportHabs)
 ToEntryHabs.grid(row=2, column=4)
 
 #Aplicate Actual Date
-ActualDateButtonHabss = ctk.CTkButton(FrameExportHabs, text="Fecha actual", border_width=1, command=lambda:set_actual_date(str("Habs")))
-ActualDateButtonHabss.grid(row=2, column=2)
+ActualDateButtonHabs = ctk.CTkButton(FrameExportHabs, text="Fecha actual", border_width=1, command=lambda:set_actual_date(str("Habs")))
+ActualDateButtonHabs.grid(row=2, column=2)
 
 #Export day
-ExportLastDayReportes = ctk.CTkButton(FrameExportHabs, text="Exportar Último Dia", command=lambda:export_time(0, (str("Habs"))))
-ExportLastDayReportes.grid(row=1, column=5, padx=5, pady=2)
+ExportLastDayHabs = ctk.CTkButton(FrameExportHabs, text="Exportar Último Dia", command=lambda:export_time(0, (str("Habs"))))
+ExportLastDayHabs.grid(row=1, column=5, padx=5, pady=2)
 
 #Export month
-ExportLastMonthReportes = ctk.CTkButton(FrameExportHabs, text="Exportar Último Mes", command=lambda:export_time(1, (str("Habs"))))
-ExportLastMonthReportes.grid(row=2, column=5, padx=5, pady=2)
+ExportLastMonthHabs = ctk.CTkButton(FrameExportHabs, text="Exportar Último Mes", command=lambda:export_time(1, (str("Habs"))))
+ExportLastMonthHabs.grid(row=2, column=5, padx=5, pady=2)
 
 #Export
 ExportButtonHabss = ctk.CTkButton(FrameExportHabs, text="Exportar", command=lambda:export(str("Habs")))
@@ -350,17 +350,27 @@ ExportButtonHabss.grid(row=3, column=4, columnspan=1, pady=(10, 0), sticky="nsew
 
 #Styles 
 def adjust_size(width, height):
-    title_font = min(int(width // 15), int(height // 15))
-    text_font = ('Helvetica', min(int(width // 45), int(height // 15)), 'bold')
-    OpenFrameReportes.configure(font=text_font)
-    OpenFrameExit.configure(font=text_font)
-    OpenFrameHabs.configure(font=text_font)
-    LabelReports.configure(font=title_font)
-    ToLabelReports.configure()
+    title_font = ('Arial', (int(width // 20) - int(height // 50)), 'bold')
+    text_font = ('Helvetica', (int(width // 15) - int(height // 10)), 'bold')
+    button_font = ('Helvetica', (int(width // 15) - int(height // 10)))
+    OpenFrameReportes.configure(font=button_font)
+    OpenFrameExit.configure(font=button_font)
+    OpenFrameHabs.configure(font=button_font)
+    LabelReports.config(font=title_font)
+    ToLabelReports.configure(font=text_font)
+    ToEntryReports.configure(font=text_font)
+    FromLabelReports.configure(font=text_font)
+    FromEntryReports.configure(font=text_font)
+    ActualDateButtonReports.configure(font=button_font)
+    ExportButtonReports.configure(font=button_font)
+    ExportLastDayReportes.configure(font=button_font)
+    ExportLastMonthReportes.configure(font=button_font)
 
 root.grid_rowconfigure(0, weight=1)
 root.grid_columnconfigure(0, weight=1)
 
-adjust_size(int(config["GEOMETRIA"]["ANCHO"]), int(config["GEOMETRIA"]["ALTO"]))
+separatorx = min(int(ScreenWidth // 60), int(ScreenHeight // 60))
+
+adjust_size(ScreenWidth, ScreenHeight)
 
 root.mainloop()
