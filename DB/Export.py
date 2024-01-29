@@ -34,45 +34,52 @@ conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database
 
 def export_Info(tabla, desde, hasta, type):
     cursor = conn.cursor()
-    if type=="Reports":
-        query = f"SELECT Reportes_Texto_Reporte, Reportes_Hora_Reporte, Reportes_Numero_Reporte, Reportes_Hora_Real_Reporte, Reportes_Numero_Real_Reporte FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
-        carpeta_exports = str(config["RUTA"]["REPORTES"])
-        encabezados = ('Texto Del Reporte', 'Hora Del Reporte', 'Numero Del Reporte', 'Hora Real Del Reporte', 'Numero Real Del Reporte')
-        CantidadValores = 5
-    elif type =="Exits":
-        query = f"SELECT Now_Local, sys_On_Off FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
-        carpeta_exports = str(config["RUTA"]["SALIDAS"])
-        encabezados = ['Hora De Accion', 'Tipo De Accion']
-        CantidadValores = 2
-    elif type=="Habs":
-        NumeroHab = re.findall(r'\d+', tabla)
-        query = f"SELECT Time_Stamp, Hab_{int(NumeroHab[0])-1}_Tiempo_Limpiando FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
-        carpeta_exports = str(config["RUTA"]["HABITACIONES"])
-        encabezados = ['Hora Terminada', f'Tiempo Limpiando Habitación {int(NumeroHab[0])}']
-        CantidadValores = 2
-
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    rows = [(re.sub(r"[\(\)]", "", item) if isinstance(item, str) else item) for row in rows for item in row]
-
-    if not os.path.exists(carpeta_exports):
-        os.makedirs(carpeta_exports)
-
     try:
+        if type=="Reports":
+            query = f"SELECT Reportes_Texto_Reporte, Reportes_Hora_Reporte, Reportes_Numero_Reporte, Reportes_Hora_Real_Reporte, Reportes_Numero_Real_Reporte FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
+            carpeta_exports = str(config["RUTA"]["REPORTES"])
+            encabezados = ('Texto Del Reporte', 'Hora Del Reporte', 'Numero Del Reporte', 'Hora Real Del Reporte', 'Numero Real Del Reporte')
+            CantidadValores = 5
+        elif type =="Exits":
+            query = f"SELECT Now_Local, sys_On_Off FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
+            carpeta_exports = str(config["RUTA"]["SALIDAS"])
+            encabezados = ['Hora De Accion', 'Tipo De Accion']
+            CantidadValores = 2
+        elif type=="Habs":
+            NumeroHab = re.findall(r'\d+', tabla)
+            query = f"SELECT Time_Stamp, Hab_{int(NumeroHab[0])-1}_Tiempo_Limpiando FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
+            carpeta_exports = str(config["RUTA"]["HABITACIONES"])
+            encabezados = ['Hora Terminada', f'Tiempo Limpiando Habitación {int(NumeroHab[0])}']
+            CantidadValores = 2
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        rows = [(re.sub(r"[\(\)]", "", item) if isinstance(item, str) else item) for row in rows for item in row]
+    
+
+        if not os.path.exists(carpeta_exports):
+            os.makedirs(carpeta_exports)
+    
+                
         exportar_excel(rows, encabezados, CantidadValores, carpeta_exports, tabla)
         show_messagebox_ok()
+
+        
     except Exception as e:
-        ErrorFound = re.search('[Errno 13]', str(e))
-        if ErrorFound:
+        print(e)
+        if re.search(r"Errno 13", str(e)):
             time = datetime.now().strftime("%d-%m-%y")
-            show_messagebox_nok(f"El archivo {tabla} {time}.xlsx está abierto por otra aplicación")
+            show_messagebox_nok(f"El archivo {tabla} {time}.xlsx está abierto por otra aplicación", 40)
+        if re.search(r"WinError 3", str(e)):
+            show_messagebox_nok(f"El sistema no puede encontrar la ruta especificada\nComprueba que la ruta está bien escrita", 30)
+        if re.search(r"list index out of range", str(e)):
+            show_messagebox_nok(f"Seleccione Una Tabla De Habitación Existente", 40)
 #####################################################################################################################################################
 
-def show_messagebox_nok(message):
+def show_messagebox_nok(message, pad):
     root.attributes("-topmost", False)
     ventana_emergente = tk.Toplevel(root)
     label_ventana_emergente = tk.Label(ventana_emergente, text=message, font=("Arial", 12))
-    label_ventana_emergente.pack(pady=40)
+    label_ventana_emergente.pack(pady=pad)
     ventana_emergente.overrideredirect(True)
     ventana_emergente.geometry(f"600x100+{int((root.winfo_screenwidth() / 2) - 300)}+{int((root.winfo_screenheight() / 2) - 50)}")
     SysCloseButton = tk.Button(ventana_emergente, image=x_photo, borderwidth=0, command=lambda:destroy_popup_nok(ventana_emergente))
