@@ -350,12 +350,13 @@ ExportButtonHabss.grid(row=3, column=4, columnspan=1, pady=(10, 0), sticky="nsew
 
 #Styles 
 def adjust_size(width, height):
-    title_font = ('Arial', (int(width // 20) - int(height // 50)), 'bold')
-    text_font = ('Helvetica', (int(width // 15) - int(height // 10)), 'bold')
-    button_font = ('Helvetica', (int(width // 15) - int(height // 10)))
-    OpenFrameReportes.configure(font=button_font)
-    OpenFrameExit.configure(font=button_font)
-    OpenFrameHabs.configure(font=button_font)
+    title_font = ('Arial', (int(width // 25) - int(height // 50)), 'bold')
+    text_font = ('Helvetica', (int(width // 40) - int(height // 80)), 'bold')
+    start_button_font = ('Arial', (int(width // 35) - int(height // 70)))
+    button_font = ('Arial', (int(width // 50) - int(height // 100)))
+    OpenFrameReportes.configure(font=start_button_font)
+    OpenFrameExit.configure(font=start_button_font)
+    OpenFrameHabs.configure(font=start_button_font)
     LabelReports.config(font=title_font)
     ToLabelReports.configure(font=text_font)
     ToEntryReports.configure(font=text_font)
@@ -369,7 +370,7 @@ def adjust_size(width, height):
 root.grid_rowconfigure(0, weight=1)
 root.grid_columnconfigure(0, weight=1)
 
-separatorx = min(int(ScreenWidth // 60), int(ScreenHeight // 60))
+separatorx = (int(ScreenWidth // 50) - int(ScreenHeight // 60))
 
 adjust_size(ScreenWidth, ScreenHeight)
 
