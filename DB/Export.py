@@ -254,12 +254,12 @@ ActualDateButtonReports = ctk.CTkButton(FrameExportReports, text="Fecha actual",
 ActualDateButtonReports.grid(row=2, column=2, padx=5)
 
 #Export day
-ExportLastDayReportes = ctk.CTkButton(FrameExportReports, text="Exportar Último Dia", command=lambda:export_time(0, (str("Reports"))))
-ExportLastDayReportes.grid(row=1, column=4, padx=5, pady=2)
+ExportLastDayReports = ctk.CTkButton(FrameExportReports, text="Exportar Último Dia", command=lambda:export_time(0, (str("Reports"))))
+ExportLastDayReports.grid(row=1, column=4, padx=5, pady=2)
 
 #Export month
-ExportLastMonthReportes = ctk.CTkButton(FrameExportReports, text="Exportar Último Mes", command=lambda:export_time(1, (str("Reports"))))
-ExportLastMonthReportes.grid(row=2, column=4, padx=5, pady=2)
+ExportLastMonthReports = ctk.CTkButton(FrameExportReports, text="Exportar Último Mes", command=lambda:export_time(1, (str("Reports"))))
+ExportLastMonthReports.grid(row=2, column=4, padx=5, pady=2)
 
 #Export
 ExportButtonReports = ctk.CTkButton(FrameExportReports, text="Exportar", command=lambda:export(str("Reports")))
@@ -343,8 +343,8 @@ ExportLastMonthHabs = ctk.CTkButton(FrameExportHabs, text="Exportar Último Mes"
 ExportLastMonthHabs.grid(row=2, column=5, padx=5, pady=2)
 
 #Export
-ExportButtonHabss = ctk.CTkButton(FrameExportHabs, text="Exportar", command=lambda:export(str("Habs")))
-ExportButtonHabss.grid(row=3, column=4, columnspan=1, pady=(10, 0), sticky="nsew")
+ExportButtonHabs = ctk.CTkButton(FrameExportHabs, text="Exportar", command=lambda:export(str("Habs")))
+ExportButtonHabs.grid(row=3, column=4, columnspan=1, pady=(10, 0), sticky="nsew")
 
 #####################################################################################################################################################
 
@@ -354,6 +354,7 @@ def adjust_size(width, height):
     text_font = ('Helvetica', (int(width // 40) - int(height // 80)), 'bold')
     start_button_font = ('Arial', (int(width // 35) - int(height // 70)))
     button_font = ('Arial', (int(width // 50) - int(height // 100)))
+    combox_font = ('Helvetica', (int(width // 50) - int(height // 80)))
     OpenFrameReportes.configure(font=start_button_font)
     OpenFrameExit.configure(font=start_button_font)
     OpenFrameHabs.configure(font=start_button_font)
@@ -364,8 +365,28 @@ def adjust_size(width, height):
     FromEntryReports.configure(font=text_font)
     ActualDateButtonReports.configure(font=button_font)
     ExportButtonReports.configure(font=button_font)
-    ExportLastDayReportes.configure(font=button_font)
-    ExportLastMonthReportes.configure(font=button_font)
+    ExportLastDayReports.configure(font=button_font)
+    ExportLastMonthReports.configure(font=button_font)
+    LabelExits.config(font=title_font)
+    ToLabelExits.configure(font=text_font)
+    ToEntryExits.configure(font=text_font)
+    FromLabelExits.configure(font=text_font)
+    FromEntryExits.configure(font=text_font)
+    ActualDateButtonExits.configure(font=button_font)
+    ExportButtonExits.configure(font=button_font)
+    ExportLastDayExits.configure(font=button_font)
+    ExportLastMonthExits.configure(font=button_font)
+    LabelHabs.config(font=title_font)
+    ToLabelHabs.configure(font=text_font)
+    ToEntryHabs.configure(font=text_font)
+    FromLabelHabs.configure(font=text_font)
+    FromEntryHabs.configure(font=text_font)
+    ActualDateButtonHabs.configure(font=button_font)
+    ExportButtonHabs.configure(font=button_font)
+    ExportLastDayHabs.configure(font=button_font)
+    ExportLastMonthHabs.configure(font=button_font)
+    TableComboxHabs.configure(font=combox_font)
+    TableHabs.config(font=text_font)
 
 root.grid_rowconfigure(0, weight=1)
 root.grid_columnconfigure(0, weight=1)
