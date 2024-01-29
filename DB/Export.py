@@ -11,18 +11,26 @@ from datetime import datetime, date, timedelta
 import openpyxl
 from openpyxl.styles import Font
 
+#####################################################################################################################################################
+
 #Configparser
 config = configparser.ConfigParser()
 config.read(os.path.abspath("Config.ini"))
+
+#####################################################################################################################################################
 
 #Geometry
 ScreenHeight = int(config["GEOMETRIA"]["ALTO"])
 ScreenWidth = int(config["GEOMETRIA"]["ANCHO"])
 
+#####################################################################################################################################################
+
 # Conexión a la base de datos
 server = str(config["DB"]["DBSERVER"]) 
 database = str(config["DB"]["DBNAME"]) 
 conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';Trusted_Connection=yes')
+
+#####################################################################################################################################################
 
 def export_Info(tabla, desde, hasta, type):
     cursor = conn.cursor()
@@ -55,6 +63,7 @@ def export_Info(tabla, desde, hasta, type):
     exportar_excel(rows, encabezados, CantidadValores, carpeta_exports, tabla)
     show_messagebox()
 
+#####################################################################################################################################################
 
 def show_messagebox():
     root.attributes("-topmost", False)
@@ -65,13 +74,15 @@ def show_messagebox():
     ventana_emergente.overrideredirect(True)
     ventana_emergente.geometry(f"200x100+{int((root.winfo_screenwidth() / 2) - 100)}+{int((root.winfo_screenheight() / 2) - 50)}")
     root.after(2000, lambda:destroy_popup(ventana_emergente))
-    
+
+#####################################################################################################################################################   
 
 def destroy_popup(ventana_emergente):
     ventana_emergente.destroy()
     root.attributes("-topmost", True)
     FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
     
+#####################################################################################################################################################
 
 def exportar_excel(rows, encabezados,CantidadValores, carpeta_exports, tabla):
     wb = openpyxl.Workbook()
@@ -92,6 +103,8 @@ def exportar_excel(rows, encabezados,CantidadValores, carpeta_exports, tabla):
 
     wb.save(f'{carpeta_exports}\{tabla} {datetime.now().strftime("%d-%m-%y")}.xlsx')
 
+#####################################################################################################################################################
+
 def set_actual_date(type):
     ActualDate= datetime.now().strftime('%Y-%m-%d')
     if type=="Reports":
@@ -104,51 +117,34 @@ def set_actual_date(type):
         ToEntryHabs.delete(0, 'end')
         ToEntryHabs.insert(0, ActualDate)
 
-def export_month(type):
-    ActualDate= datetime.now().strftime('%Y-%m-%d')
-    first_day_of_month = date.today().replace(day=1)
+#####################################################################################################################################################
+
+def export_time(time, type):
+    ar_time = []
+    yesterday = datetime.now() - timedelta(days=1)
+    ar_time.append(yesterday.strftime('%Y-%m-%d'))
+    ar_time.append(date.today().replace(day=1).strftime('%Y-%m-%d'))
+    ar_time.append(datetime.now().strftime('%Y-%m-%d'))
     if type=="Reports":
         FromEntryReports.delete(0, 'end')
-        FromEntryReports.insert(0, first_day_of_month)
+        FromEntryReports.insert(0, ar_time[time])
         ToEntryReports.delete(0, 'end')
-        ToEntryReports.insert(0, ActualDate)
+        ToEntryReports.insert(0, ar_time[2])
         export(type)
     elif type=="Exits":
         FromEntryExits.delete(0, 'end')
-        FromEntryExits.insert(0, first_day_of_month)
+        FromEntryExits.insert(0, ar_time[time])
         ToEntryExits.delete(0, 'end')
-        ToEntryExits.insert(0, ActualDate)
+        ToEntryExits.insert(0, ar_time[2])
         export(type)
     elif type=="Habs":
         FromEntryHabs.delete(0, 'end')
-        FromEntryHabs.insert(0, first_day_of_month)
+        FromEntryHabs.insert(0, ar_time[time])
         ToEntryHabs.delete(0, 'end')
-        ToEntryHabs.insert(0, ActualDate)
+        ToEntryHabs.insert(0, ar_time[2])
         export(type)
 
-def export_day(type):
-    ActualDate= datetime.now().strftime('%Y-%m-%d')
-    yesterday = datetime.now() - timedelta(days=1)
-    yesterday = yesterday.strftime('%Y-%m-%d')
-    if type=="Reports":
-        FromEntryReports.delete(0, 'end')
-        FromEntryReports.insert(0, yesterday)
-        ToEntryReports.delete(0, 'end')
-        ToEntryReports.insert(0, ActualDate)
-        export(type)
-    elif type=="Exits":
-        FromEntryExits.delete(0, 'end')
-        FromEntryExits.insert(0, yesterday)
-        ToEntryExits.delete(0, 'end')
-        ToEntryExits.insert(0, ActualDate)
-        export(type)
-    elif type=="Habs":
-        FromEntryHabs.delete(0, 'end')
-        FromEntryHabs.insert(0, yesterday)
-        ToEntryHabs.delete(0, 'end')
-        ToEntryHabs.insert(0, ActualDate)
-        export(type)
-        
+#####################################################################################################################################################    
 
 def export(type):
     if type=="Reports":
@@ -167,6 +163,8 @@ def export(type):
     
     export_Info(table, since, till, type)
 
+#####################################################################################################################################################
+
 def GoBack(all):
     GoBackButton.place_forget()
     FrameExportReports.place_forget()
@@ -174,6 +172,8 @@ def GoBack(all):
     FrameExportHabs.place_forget()
     if all:
         FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
+
+#####################################################################################################################################################
 
 def show_Reports():
     FrameExportaciones.place_forget()
@@ -190,15 +190,14 @@ def show_Habs():
     FrameExportHabs.place(relx=0.5, rely=0.5, anchor='center')
     GoBackButton.place(relx=0, x=0, y=0, anchor='nw')
 
+#####################################################################################################################################################
 
 # Interfaz de usuario
 root = tk.Tk()
 root.title("Exportar Información")
 root.config(bg='#505050')
 
-#Styles 
-text_font = ('Helvetica', 12, 'bold')
-title_font = ('Helvetica', 20, 'bold')
+#####################################################################################################################################################
 
 #Frames
 FrameExportaciones = tk.Frame(root, width=int(ScreenWidth/2), height=int(ScreenHeight/2), bg= '#505050')
@@ -206,7 +205,7 @@ FrameExportReports = tk.Frame(root, bg= '#505050')
 FrameExportExit = tk.Frame(root, bg= '#505050')
 FrameExportHabs = tk.Frame(root, bg= '#505050')
 
-
+#####################################################################################################################################################
 
 #Scree Gometry
 ScreeGometry = f'{ScreenWidth}x{ScreenHeight}+{int((root.winfo_screenwidth() / 2) - (ScreenWidth / 2))}+{int((root.winfo_screenheight() / 2) - (ScreenHeight / 2))}'
@@ -225,9 +224,6 @@ SysCloseButton.place(relx=1, x=0, y=0, anchor='ne')
 back_phooto = PhotoImage(file=os.path.abspath("Back_Button.png"))
 GoBackButton = tk.Button(root, image=back_phooto, borderwidth=0, bg= '#505050', command=lambda:GoBack(True))
 
-#Normal Button
-button_photo = PhotoImage(file=os.path.abspath('Button.png'))
-
 #####################################################################################################################################################
 
 #Initial Frame
@@ -236,19 +232,19 @@ FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
 #####################################################################################################################################################
 
 #Open Reports
-OpenFrameReportes = ctk.CTkButton(FrameExportaciones, text="Exportar Reportes", command=show_Reports)
+OpenFrameReportes = ctk.CTkButton(FrameExportaciones, text="Exportar Reportes", command=show_Reports, font=("Arial", 40))
 OpenFrameReportes.grid(row=1, column=0, padx=10, pady=10)
 
 #To Frame Reports
-LabelReports = tk.Label(FrameExportReports, text="Exportador Tabla Reportes", bg= '#505050', font=title_font, fg='white')
+LabelReports = tk.Label(FrameExportReports, text="Exportador Tabla Reportes", bg= '#505050', fg='white')
 LabelReports.grid(row=0, columnspan=3, pady=5)
 
-FromLabelReports = tk.Label(FrameExportReports, text="Desde:", bg= '#505050', font=text_font, fg='white')
+FromLabelReports = tk.Label(FrameExportReports, text="Desde:", bg= '#505050', fg='white')
 FromLabelReports.grid(row=1, column=0)
 FromEntryReports = tk.Entry(FrameExportReports, width=12, font= 10)
 FromEntryReports.grid(row=1, column=1)
 
-ToLabelReports = tk.Label(FrameExportReports, text="Hasta:", bg='#505050', font=text_font, fg='white')
+ToLabelReports = tk.Label(FrameExportReports, text="Hasta:", bg='#505050', fg='white')
 ToLabelReports.grid(row=2, column=0)
 ToEntryReports = tk.Entry(FrameExportReports, width=12, font= 10)
 ToEntryReports.grid(row=2, column=1)
@@ -258,11 +254,11 @@ ActualDateButtonReports = ctk.CTkButton(FrameExportReports, text="Fecha actual",
 ActualDateButtonReports.grid(row=2, column=2)
 
 #Export day
-ExportLastDayReportes = ctk.CTkButton(FrameExportReports, text="Exportar Último Dia", command=lambda:export_day(str("Reports")))
+ExportLastDayReportes = ctk.CTkButton(FrameExportReports, text="Exportar Último Dia", command=lambda:export_time(0, (str("Reports"))))
 ExportLastDayReportes.grid(row=1, column=4, padx=5, pady=2)
 
 #Export month
-ExportLastMonthReportes = ctk.CTkButton(FrameExportReports, text="Exportar Último Mes", command=lambda:export_month(str("Reports")))
+ExportLastMonthReportes = ctk.CTkButton(FrameExportReports, text="Exportar Último Mes", command=lambda:export_time(1, (str("Reports"))))
 ExportLastMonthReportes.grid(row=2, column=4, padx=5, pady=2)
 
 #Export
@@ -271,20 +267,20 @@ ExportButtonReports.grid(row=3, column=1, columnspan=1, pady=(10, 0), sticky="ns
 
 #####################################################################################################################################################
 
-# Update the widget styles
+#Open Exits
 OpenFrameExit = ctk.CTkButton(FrameExportaciones, text="Exportar Salidas Del Sistema", command=show_Exit)
 OpenFrameExit.grid(row=1, column=1, padx=10, pady=10)
 
 #To Frame Exits
-LabelExits = tk.Label(FrameExportExit, text="Exportador Tabla Reportes", bg= '#505050', font=title_font, fg='white')
+LabelExits = tk.Label(FrameExportExit, text="Exportador Tabla Reportes", bg= '#505050', fg='white')
 LabelExits.grid(row=0, columnspan=3, pady=5)
 
-FromLabelExits = tk.Label(FrameExportExit, text="Desde:", bg= '#505050', font=text_font, fg='white')
+FromLabelExits = tk.Label(FrameExportExit, text="Desde:", bg= '#505050', fg='white')
 FromLabelExits.grid(row=1, column=0)
 FromEntryExits = tk.Entry(FrameExportExit, width=12, font= 10)
 FromEntryExits.grid(row=1, column=1)
 
-ToLabelExits = tk.Label(FrameExportExit, text="Hasta:", bg='#505050', font=text_font, fg='white')
+ToLabelExits = tk.Label(FrameExportExit, text="Hasta:", bg='#505050', fg='white')
 ToLabelExits.grid(row=2, column=0)
 ToEntryExits = tk.Entry(FrameExportExit, width=12, font= 10)
 ToEntryExits.grid(row=2, column=1)
@@ -294,11 +290,11 @@ ActualDateButtonExits = ctk.CTkButton(FrameExportExit, text="Fecha actual", bord
 ActualDateButtonExits.grid(row=2, column=2)
 
 #Export day
-ExportLastDayReportes = ctk.CTkButton(FrameExportExit, text="Exportar Último Dia", command=lambda:export_day(str("Exits")))
+ExportLastDayReportes = ctk.CTkButton(FrameExportExit, text="Exportar Último Dia", command=lambda:export_time(0, (str("Exits"))))
 ExportLastDayReportes.grid(row=1, column=4, padx=5, pady=2)
 
 #Export month
-ExportLastMonthReportes = ctk.CTkButton(FrameExportExit, text="Exportar Último Mes", command=lambda:export_month(str("Exits")))
+ExportLastMonthReportes = ctk.CTkButton(FrameExportExit, text="Exportar Último Mes", command=lambda:export_time(1, (str("Exits"))))
 ExportLastMonthReportes.grid(row=2, column=4, padx=5, pady=2)
 
 #Export
@@ -312,10 +308,10 @@ OpenFrameHabs = ctk.CTkButton(FrameExportaciones, text="Exportar Limpieza Habita
 OpenFrameHabs.grid(row=1, column=2, padx=10, pady=10)
 
 #To Frame Habs
-LabelHabs = tk.Label(FrameExportHabs, text="Exportador Tabla Habitaciones", bg= '#505050', font=title_font, fg='white')
+LabelHabs = tk.Label(FrameExportHabs, text="Exportador Tabla Habitaciones", bg= '#505050', fg='white')
 LabelHabs.grid(row=0, columnspan=6, pady=5)
 
-TableHabs = tk.Label(FrameExportHabs, text="Tabla:", bg= '#505050', font=text_font, fg='white')
+TableHabs = tk.Label(FrameExportHabs, text="Tabla:", bg= '#505050', fg='white')
 TableHabs.grid(row=1, column=1)
 
 with open('archivo_valores.txt', 'r') as file:
@@ -324,12 +320,12 @@ with open('archivo_valores.txt', 'r') as file:
 TableComboxHabs = ttk.Combobox(FrameExportHabs, values=ListHabs, width=31)
 TableComboxHabs.grid(row=1, column=2, padx=2)
 
-FromLabelHabs = tk.Label(FrameExportHabs, text="Desde:", bg= '#505050', font=text_font, fg='white')
+FromLabelHabs = tk.Label(FrameExportHabs, text="Desde:", bg= '#505050', fg='white')
 FromLabelHabs.grid(row=1, column=3)
 FromEntryHabs = tk.Entry(FrameExportHabs)
 FromEntryHabs.grid(row=1, column=4)
 
-ToLabelHabs = tk.Label(FrameExportHabs, text="Hasta:", bg= '#505050', font=text_font, fg='white')
+ToLabelHabs = tk.Label(FrameExportHabs, text="Hasta:", bg= '#505050', fg='white')
 ToLabelHabs.grid(row=2, column=3)
 ToEntryHabs = tk.Entry(FrameExportHabs)
 ToEntryHabs.grid(row=2, column=4)
@@ -339,11 +335,11 @@ ActualDateButtonHabss = ctk.CTkButton(FrameExportHabs, text="Fecha actual", bord
 ActualDateButtonHabss.grid(row=2, column=2)
 
 #Export day
-ExportLastDayReportes = ctk.CTkButton(FrameExportHabs, text="Exportar Último Dia", command=lambda:export_day(str("Habs")))
+ExportLastDayReportes = ctk.CTkButton(FrameExportHabs, text="Exportar Último Dia", command=lambda:export_time(0, (str("Habs"))))
 ExportLastDayReportes.grid(row=1, column=5, padx=5, pady=2)
 
 #Export month
-ExportLastMonthReportes = ctk.CTkButton(FrameExportHabs, text="Exportar Último Mes", command=lambda:export_month(str("Habs")))
+ExportLastMonthReportes = ctk.CTkButton(FrameExportHabs, text="Exportar Último Mes", command=lambda:export_time(1, (str("Habs"))))
 ExportLastMonthReportes.grid(row=2, column=5, padx=5, pady=2)
 
 #Export
@@ -352,5 +348,19 @@ ExportButtonHabss.grid(row=3, column=4, columnspan=1, pady=(10, 0), sticky="nsew
 
 #####################################################################################################################################################
 
+#Styles 
+def adjust_size(width, height):
+    title_font = min(int(width // 15), int(height // 15))
+    text_font = ('Helvetica', min(int(width // 45), int(height // 15)), 'bold')
+    OpenFrameReportes.configure(font=text_font)
+    OpenFrameExit.configure(font=text_font)
+    OpenFrameHabs.configure(font=text_font)
+    LabelReports.configure(font=title_font)
+    ToLabelReports.configure()
+
+root.grid_rowconfigure(0, weight=1)
+root.grid_columnconfigure(0, weight=1)
+
+adjust_size(int(config["GEOMETRIA"]["ANCHO"]), int(config["GEOMETRIA"]["ALTO"]))
 
 root.mainloop()

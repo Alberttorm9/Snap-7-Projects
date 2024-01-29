@@ -1,25 +1,27 @@
 import tkinter as tk
+import configparser
 
-# Función para cerrar la ventana emergente después de 2 segundos
-def cerrar_ventana():
-    ventana_emergente.destroy()
+def adjust_size(width, height):
+    new_font_size = min(width // 20, height // 20)
+    OpenFrameReportes.config(font=("Arial", new_font_size))
 
-# Crear la ventana principal
+# Leer la configuración desde el archivo .ini
+config = configparser.ConfigParser()
+config.read('config2.ini')
+width = config.getint('GUI', 'width')
+height = config.getint('GUI', 'height')
+
 root = tk.Tk()
+root.geometry(f"{width}x{height}")
 
-# Configurar la geometría y otras propiedades
-ScreenGeometry = "200x200"  # Aquí tu ScreenGeometry
-root.geometry(ScreenGeometry)
-root.overrideredirect(True)
-root.attributes("-topmost", True)
+# Suponiendo que 'OpenFrameReportes' es un botón de tu interfaz
+OpenFrameReportes = tk.Button(root, text="Exportar Reportes", font=("Arial", 40))
+OpenFrameReportes.grid(row=1, column=0, padx=10, pady=10)
 
-# Crear la ventana emergente
-ventana_emergente = tk.Toplevel(root)
-ventana_emergente.title("Ventana Emergente")
-ventana_emergente.geometry("150x100+200+200")
+# Llamamos a adjust_size una vez al inicio para ajustar el tamaño
+adjust_size(width, height)
 
-# Llamar a la función para cerrar la ventana emergente después de 2 segundos
-root.after(2000, cerrar_ventana)
+root.grid_rowconfigure(0, weight=1)
+root.grid_columnconfigure(0, weight=1)
 
-# Iniciar el bucle principal
 root.mainloop()
