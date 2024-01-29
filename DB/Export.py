@@ -1,6 +1,7 @@
 import tkinter as tk
-from tkinter import PhotoImage, ttk 
+from tkinter import PhotoImage, ttk
 from PIL import Image, ImageTk
+import customtkinter as ctk
 import pyodbc
 import os
 import re
@@ -36,7 +37,7 @@ def export_Info(tabla, desde, hasta, type):
         encabezados = ['Hora De Accion', 'Tipo De Accion']
         CantidadValores = 2
     elif type=="Habs":
-        NumeroHab = re.findall(r'\d+', tabla)  # Encuentra todos los dígitos en la cadena de texto
+        NumeroHab = re.findall(r'\d+', tabla)
         query = f"SELECT Time_Stamp, Hab_{int(NumeroHab[0])-1}_Tiempo_Limpiando FROM {tabla} WHERE Time_Stamp >= '{desde}' AND Time_Stamp <= '{hasta} 23:59:59.000000'"
         carpeta_exports = str(config["RUTA"]["HABITACIONES"])
         encabezados = ['Hora Terminada', f'Tiempo Limpiando Habitación {int(NumeroHab[0])}']
@@ -52,6 +53,25 @@ def export_Info(tabla, desde, hasta, type):
 
 
     exportar_excel(rows, encabezados, CantidadValores, carpeta_exports, tabla)
+    show_messagebox()
+
+
+def show_messagebox():
+    root.attributes("-topmost", False)
+    GoBack(False)
+    ventana_emergente = tk.Toplevel(root)
+    label_ventana_emergente = tk.Label(ventana_emergente, text="Exportación Correcta", font=("Arial", 12))
+    label_ventana_emergente.pack(pady=40)
+    ventana_emergente.overrideredirect(True)
+    ventana_emergente.geometry(f"200x100+{int((root.winfo_screenwidth() / 2) - 100)}+{int((root.winfo_screenheight() / 2) - 50)}")
+    root.after(2000, lambda:destroy_popup(ventana_emergente))
+    
+
+def destroy_popup(ventana_emergente):
+    ventana_emergente.destroy()
+    root.attributes("-topmost", True)
+    FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
+    
 
 def exportar_excel(rows, encabezados,CantidadValores, carpeta_exports, tabla):
     wb = openpyxl.Workbook()
@@ -147,12 +167,13 @@ def export(type):
     
     export_Info(table, since, till, type)
 
-def GoBack():
+def GoBack(all):
     GoBackButton.place_forget()
     FrameExportReports.place_forget()
     FrameExportExit.place_forget()
     FrameExportHabs.place_forget()
-    FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
+    if all:
+        FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
 
 def show_Reports():
     FrameExportaciones.place_forget()
@@ -175,12 +196,7 @@ root = tk.Tk()
 root.title("Exportar Información")
 root.config(bg='#505050')
 
-# Configure the style for the buttons
-style = ttk.Style()
-style.configure('TButton', font=('calibri', 10, 'bold'), foreground='black')
-style.configure('TLabel', font=('calibri', 10), foreground='black')
-style.configure('TEntry', font=('calibri', 10), foreground='black')
-
+#Styles 
 text_font = ('Helvetica', 12, 'bold')
 title_font = ('Helvetica', 20, 'bold')
 
@@ -207,7 +223,10 @@ SysCloseButton.place(relx=1, x=0, y=0, anchor='ne')
 
 #Go Back
 back_phooto = PhotoImage(file=os.path.abspath("Back_Button.png"))
-GoBackButton = tk.Button(root, image=back_phooto, borderwidth=0, bg= '#505050', command=GoBack)
+GoBackButton = tk.Button(root, image=back_phooto, borderwidth=0, bg= '#505050', command=lambda:GoBack(True))
+
+#Normal Button
+button_photo = PhotoImage(file=os.path.abspath('Button.png'))
 
 #####################################################################################################################################################
 
@@ -217,7 +236,7 @@ FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
 #####################################################################################################################################################
 
 #Open Reports
-OpenFrameReportes = ttk.Button(FrameExportaciones, text="Exportar Reportes", command=show_Reports)
+OpenFrameReportes = ctk.CTkButton(FrameExportaciones, text="Exportar Reportes", command=show_Reports)
 OpenFrameReportes.grid(row=1, column=0, padx=10, pady=10)
 
 #To Frame Reports
@@ -234,23 +253,26 @@ ToLabelReports.grid(row=2, column=0)
 ToEntryReports = tk.Entry(FrameExportReports, width=12, font= 10)
 ToEntryReports.grid(row=2, column=1)
 
-ActualDateButtonReports = ttk.Button(FrameExportReports, text="Fecha actual", command=lambda:set_actual_date(str("Reports")))
+#Aplicate Actual Date
+ActualDateButtonReports = ctk.CTkButton(FrameExportReports, text="Fecha actual", border_width=1, command=lambda:set_actual_date(str("Reports")))
 ActualDateButtonReports.grid(row=2, column=2)
 
-#Exportar un día
-ExportLastDayReportes = ttk.Button(FrameExportReports, text="Exportar Último Dia", width=17, command=lambda:export_day(str("Reports")))
-ExportLastDayReportes.grid(row=1, column=4, padx=5, pady=2, sticky="w")
+#Export day
+ExportLastDayReportes = ctk.CTkButton(FrameExportReports, text="Exportar Último Dia", command=lambda:export_day(str("Reports")))
+ExportLastDayReportes.grid(row=1, column=4, padx=5, pady=2)
 
-ExportLastMonthReportes = ttk.Button(FrameExportReports, text="Exportar Último Mes", width=17, command=lambda:export_month(str("Reports")))
-ExportLastMonthReportes.grid(row=2, column=4, padx=5, pady=2, sticky="w")
+#Export month
+ExportLastMonthReportes = ctk.CTkButton(FrameExportReports, text="Exportar Último Mes", command=lambda:export_month(str("Reports")))
+ExportLastMonthReportes.grid(row=2, column=4, padx=5, pady=2)
 
-ExportButtonReports = ttk.Button(FrameExportReports, text="Exportar", command=lambda:export(str("Reports")))
+#Export
+ExportButtonReports = ctk.CTkButton(FrameExportReports, text="Exportar", command=lambda:export(str("Reports")))
 ExportButtonReports.grid(row=3, column=1, columnspan=1, pady=(10, 0), sticky="nsew")
 
 #####################################################################################################################################################
 
 # Update the widget styles
-OpenFrameExit = ttk.Button(FrameExportaciones, text="Exportar Salidas Del Sistema", command=show_Exit)
+OpenFrameExit = ctk.CTkButton(FrameExportaciones, text="Exportar Salidas Del Sistema", command=show_Exit)
 OpenFrameExit.grid(row=1, column=1, padx=10, pady=10)
 
 #To Frame Exits
@@ -267,16 +289,26 @@ ToLabelExits.grid(row=2, column=0)
 ToEntryExits = tk.Entry(FrameExportExit, width=12, font= 10)
 ToEntryExits.grid(row=2, column=1)
 
-ActualDateButtonExits = ttk.Button(FrameExportExit, text="Fecha actual", command=set_actual_date)
+#Aplicate Actual Date
+ActualDateButtonExits = ctk.CTkButton(FrameExportExit, text="Fecha actual", border_width=1, command=lambda:set_actual_date(str("Exits")))
 ActualDateButtonExits.grid(row=2, column=2)
 
-ExportButtonExits = ttk.Button(FrameExportExit, text="Exportar", command=lambda:export(str("Exits")))
+#Export day
+ExportLastDayReportes = ctk.CTkButton(FrameExportExit, text="Exportar Último Dia", command=lambda:export_day(str("Exits")))
+ExportLastDayReportes.grid(row=1, column=4, padx=5, pady=2)
+
+#Export month
+ExportLastMonthReportes = ctk.CTkButton(FrameExportExit, text="Exportar Último Mes", command=lambda:export_month(str("Exits")))
+ExportLastMonthReportes.grid(row=2, column=4, padx=5, pady=2)
+
+#Export
+ExportButtonExits = ctk.CTkButton(FrameExportExit, text="Exportar", command=lambda:export(str("Exits")))
 ExportButtonExits.grid(row=3, column=1, columnspan=1, pady=(10, 0), sticky="nsew")
 
 #####################################################################################################################################################
 
 #Open Habs
-OpenFrameHabs = ttk.Button(FrameExportaciones, text="Exportar Limpieza Habitaciones", command=show_Habs)
+OpenFrameHabs = ctk.CTkButton(FrameExportaciones, text="Exportar Limpieza Habitaciones", command=show_Habs)
 OpenFrameHabs.grid(row=1, column=2, padx=10, pady=10)
 
 #To Frame Habs
@@ -285,6 +317,7 @@ LabelHabs.grid(row=0, columnspan=6, pady=5)
 
 TableHabs = tk.Label(FrameExportHabs, text="Tabla:", bg= '#505050', font=text_font, fg='white')
 TableHabs.grid(row=1, column=1)
+
 with open('archivo_valores.txt', 'r') as file:
     ListHabs = file.readlines()
     ListHabs = [valor.strip() for valor in ListHabs]
@@ -301,12 +334,23 @@ ToLabelHabs.grid(row=2, column=3)
 ToEntryHabs = tk.Entry(FrameExportHabs)
 ToEntryHabs.grid(row=2, column=4)
 
-ActualDateButtonHabs = ttk.Button(FrameExportHabs, text="Fecha actual", command=set_actual_date)
-ActualDateButtonHabs.grid(row=2, column=5, padx=10)
+#Aplicate Actual Date
+ActualDateButtonHabss = ctk.CTkButton(FrameExportHabs, text="Fecha actual", border_width=1, command=lambda:set_actual_date(str("Habs")))
+ActualDateButtonHabss.grid(row=2, column=2)
 
-ExportButtonHabs = ttk.Button(FrameExportHabs, text="Exportar", command=lambda:export(str("Habs")))
-ExportButtonHabs.grid(row=4, columnspan=6, pady=10)
+#Export day
+ExportLastDayReportes = ctk.CTkButton(FrameExportHabs, text="Exportar Último Dia", command=lambda:export_day(str("Habs")))
+ExportLastDayReportes.grid(row=1, column=5, padx=5, pady=2)
+
+#Export month
+ExportLastMonthReportes = ctk.CTkButton(FrameExportHabs, text="Exportar Último Mes", command=lambda:export_month(str("Habs")))
+ExportLastMonthReportes.grid(row=2, column=5, padx=5, pady=2)
+
+#Export
+ExportButtonHabss = ctk.CTkButton(FrameExportHabs, text="Exportar", command=lambda:export(str("Habs")))
+ExportButtonHabss.grid(row=3, column=4, columnspan=1, pady=(10, 0), sticky="nsew")
 
 #####################################################################################################################################################
+
 
 root.mainloop()

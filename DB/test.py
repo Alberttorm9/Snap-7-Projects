@@ -1,53 +1,25 @@
 import tkinter as tk
 
-class Calculadora:
-    def __init__(self, ventana):
-        self.ventana = ventana
-        self.ventana.title("Calculadora")
+# Función para cerrar la ventana emergente después de 2 segundos
+def cerrar_ventana():
+    ventana_emergente.destroy()
 
-        self.entrada = tk.Entry(ventana, width=20, font=("Arial", 16))
-        self.entrada.grid(row=0, column=0, columnspan=4)
+# Crear la ventana principal
+root = tk.Tk()
 
-        botones = [
-            '7', '8', '9', '/',
-            '4', '5', '6', '*',
-            '1', '2', '3', '-',
-            '0', 'C', '=', '+'
-        ]
+# Configurar la geometría y otras propiedades
+ScreenGeometry = "200x200"  # Aquí tu ScreenGeometry
+root.geometry(ScreenGeometry)
+root.overrideredirect(True)
+root.attributes("-topmost", True)
 
-        fila = 1
-        columna = 0
-        for boton_texto in botones:
-            if boton_texto == '=':
-                boton = tk.Button(ventana, text=boton_texto, width=10, command=self.calcular)
-            elif boton_texto == 'C':
-                boton = tk.Button(ventana, text=boton_texto, width=10, command=self.limpiar)
-            else:
-                boton = tk.Button(ventana, text=boton_texto, width=5, command=lambda texto=boton_texto: self.anadir_texto(texto))
-            boton.grid(row=fila, column=columna)
-            columna += 1
-            if columna > 3:
-                columna = 0
-                fila += 1
+# Crear la ventana emergente
+ventana_emergente = tk.Toplevel(root)
+ventana_emergente.title("Ventana Emergente")
+ventana_emergente.geometry("150x100+200+200")
 
-    def anadir_texto(self, texto):
-        self.entrada.insert(tk.END, texto)
+# Llamar a la función para cerrar la ventana emergente después de 2 segundos
+root.after(2000, cerrar_ventana)
 
-    def limpiar(self):
-        self.entrada.delete(0, tk.END)
-
-    def calcular(self):
-        try:
-            resultado = eval(self.entrada.get())
-            self.entrada.delete(0, tk.END)
-            self.entrada.insert(tk.END, str(resultado))
-        except:
-            self.entrada.delete(0, tk.END)
-            self.entrada.insert(tk.END, "Error")
-
-# Crear ventana
-ventana = tk.Tk()
-mi_calculadora = Calculadora(ventana)
-
-# Ejecutar ventana
-ventana.mainloop()
+# Iniciar el bucle principal
+root.mainloop()
