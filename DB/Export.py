@@ -51,7 +51,6 @@ def export_Info(tabla, desde, hasta, type):
         encabezados = ['Hora Terminada', f'Tiempo Limpiando Habitación {int(NumeroHab[0])}']
         CantidadValores = 2
 
-    print(query + "\n\n")
     cursor.execute(query)
     rows = cursor.fetchall()
     rows = [(re.sub(r"[\(\)]", "", item) if isinstance(item, str) else item) for row in rows for item in row]
@@ -59,13 +58,36 @@ def export_Info(tabla, desde, hasta, type):
     if not os.path.exists(carpeta_exports):
         os.makedirs(carpeta_exports)
 
+    try:
+        exportar_excel(rows, encabezados, CantidadValores, carpeta_exports, tabla)
+        show_messagebox_ok()
+    except Exception as e:
+        ErrorFound = re.search('[Errno 13]', str(e))
+        if ErrorFound:
+            time = datetime.now().strftime("%d-%m-%y")
+            show_messagebox_nok(f"El archivo {tabla} {time}.xlsx está abierto por otra aplicación")
+#####################################################################################################################################################
 
-    exportar_excel(rows, encabezados, CantidadValores, carpeta_exports, tabla)
-    show_messagebox()
+def show_messagebox_nok(message):
+    root.attributes("-topmost", False)
+    ventana_emergente = tk.Toplevel(root)
+    label_ventana_emergente = tk.Label(ventana_emergente, text=message, font=("Arial", 12))
+    label_ventana_emergente.pack(pady=40)
+    ventana_emergente.overrideredirect(True)
+    ventana_emergente.geometry(f"600x100+{int((root.winfo_screenwidth() / 2) - 300)}+{int((root.winfo_screenheight() / 2) - 50)}")
+    SysCloseButton = tk.Button(ventana_emergente, image=x_photo, borderwidth=0, command=lambda:destroy_popup_nok(ventana_emergente))
+    SysCloseButton.place(relx=1, x=0, y=0, anchor='ne')
+    root.after(5000, lambda:destroy_popup_nok(ventana_emergente))
+
+#####################################################################################################################################################   
+
+def destroy_popup_nok(ventana_emergente):
+    ventana_emergente.destroy()
+    root.attributes("-topmost", True)
 
 #####################################################################################################################################################
 
-def show_messagebox():
+def show_messagebox_ok():
     root.attributes("-topmost", False)
     GoBack(False)
     ventana_emergente = tk.Toplevel(root)
@@ -73,11 +95,11 @@ def show_messagebox():
     label_ventana_emergente.pack(pady=40)
     ventana_emergente.overrideredirect(True)
     ventana_emergente.geometry(f"200x100+{int((root.winfo_screenwidth() / 2) - 100)}+{int((root.winfo_screenheight() / 2) - 50)}")
-    root.after(2000, lambda:destroy_popup(ventana_emergente))
+    root.after(2000, lambda:destroy_popup_ok(ventana_emergente))
 
 #####################################################################################################################################################   
 
-def destroy_popup(ventana_emergente):
+def destroy_popup_ok(ventana_emergente):
     ventana_emergente.destroy()
     root.attributes("-topmost", True)
     FrameExportaciones.place(relx=0.5, rely=0.5, anchor='center')
