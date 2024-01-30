@@ -104,10 +104,29 @@ def on_mid_click(event):
     canvas.coords(Usuario, x, y)
 
 def actualizar():
-    if plc.read("V50.1"):
-        canvas.itemconfig(puerta_Abriendose, image=BotonZ_Image)
+
+    if plc.read("V50.4"):
+        canvas.itemconfig(luz_estados, image=Boton_Image)
+    elif plc.read("V50.3"):
+        canvas.itemconfig(luz_estados, image=Boton3_Image)
+    elif plc.read("V50.2"):
+        canvas.itemconfig(luz_estados, image=Boton2_Image)
     else:
-        canvas.itemconfig(puerta_Abriendose, image="")
+        canvas.itemconfig(luz_estados, image=BotonX_Image)
+
+    if plc.read("V51.1"):
+        canvas.itemconfig(Texto_Exterior, text="En Limpieza") 
+    elif plc.read("V51.2"):
+        canvas.itemconfig(Texto_Exterior, text="Habitación Libre") 
+    elif plc.read("V51.3"):
+        canvas.itemconfig(Texto_Exterior, text="Esperando Salida")
+    else: 
+        canvas.itemconfig(Texto_Exterior, text="")
+        
+    if plc.read("V50.1"):
+        canvas.itemconfig(Puerta, image=Puerta_Image)
+    else:
+        canvas.itemconfig(Puerta, image=Puerta2_Image)
         
     if plc.read("V50.0"):
         canvas.itemconfig(portal_Abriendose, image=BotonZ_Image)
@@ -136,10 +155,6 @@ def actualizar():
     else:
         canvas.itemconfig(Portal, image=Portal3_Image)
 
-    if plc.read("V90.2"):
-        canvas.itemconfig(Puerta, image=Puerta2_Image)
-    else:
-        canvas.itemconfig(Puerta, image=Puerta_Image)
     root.after(100, actualizar)
 
 
@@ -159,6 +174,7 @@ Plano_image = ImageTk.PhotoImage(file=os.path.abspath("PLANO.png"))
 Boton_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton.png"))
 Boton2_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton2.png"))
 Boton3_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton3.png"))
+BotonX_Image = ImageTk.PhotoImage(file=os.path.abspath("BotonX.png"))
 BotonZ_Image = ImageTk.PhotoImage(file=os.path.abspath("BotonZ.png"))
 SelectorOff = ImageTk.PhotoImage(file=os.path.abspath("SelectorOff.png"))
 SelectorOn = ImageTk.PhotoImage(file=os.path.abspath("SelectorOn.png"))
@@ -281,11 +297,6 @@ canvas.tag_bind(selector_Limpieza, '<Button-1>', lambda e: on_Limpieza())
 
 #####################################################################################################################################################
 
-#Puerta Abriendose
-puerta_Abriendose = canvas.create_image(935, 60, image="", anchor='nw')
-
-#####################################################################################################################################################
-
 #Portal Abriendose
 portal_Abriendose = canvas.create_image(1680, 280, image="", anchor='nw')
 
@@ -339,13 +350,24 @@ Portal = canvas.create_image(1780, 280, anchor=tk.CENTER)
 
 #####################################################################################################################################################
 
+#Luz Estados
+luz_estados = canvas.create_image(20, 120, image="", anchor=tk.CENTER)
+
+#####################################################################################################################################################
+
+#Texto Exterior
+Cuadrado_Texto = canvas.create_rectangle(920, 210, 1020, 240, fill='lightgrey')
+Texto_Exterior = canvas.create_text(970, 225, text="", fill="black")
+
+#####################################################################################################################################################
+
 #Usuario
-Usuario = canvas.create_image(0, 0, image=Usuario_Image, anchor=tk.CENTER)
+Usuario = canvas.create_image(-100, 0, image=Usuario_Image, anchor=tk.CENTER)
 
 #####################################################################################################################################################
 
 #Trabajador
-Trabajador = canvas.create_image(0, 0, image=Trabajador_Image, anchor=tk.CENTER)
+Trabajador = canvas.create_image(-100, 0, image=Trabajador_Image, anchor=tk.CENTER)
 
 #####################################################################################################################################################
 
