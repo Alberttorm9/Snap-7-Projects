@@ -2,6 +2,8 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import os
 import snap7
+import threading
+import time
 
 plc = snap7.logo.Logo()
 plc.connect('192.168.30.102', 0, 1)
@@ -69,30 +71,6 @@ def on_Limpieza():
         plc.write("V60.0", 1)
         canvas.itemconfig(selector_Limpieza, image=SelectorOn)
 
-def on_sensor_cerrado():
-    if plc.read("V90.0"):
-        plc.write("V80.0", 0)
-        canvas.itemconfig(sensor_cerrado, image=Sensor2_Image)
-    else:
-        plc.write("V80.0", 1)
-        canvas.itemconfig(sensor_cerrado, image=Sensor_Image)
-
-def on_sensor_abierto():
-    if plc.read("V90.1"):
-        plc.write("V80.1", 0)
-        canvas.itemconfig(sensor_abierto, image=Sensor2_Image)
-    else:
-        plc.write("V80.1", 1)
-        canvas.itemconfig(sensor_abierto, image=Sensor_Image)
-
-def on_sensor_puerta():
-    if plc.read("V90.2"):
-        plc.write("V80.2", 0)
-        canvas.itemconfig(sensor_puerta, image=Sensor4_Image)
-    else:
-        plc.write("V80.2", 1)
-        canvas.itemconfig(sensor_puerta, image=Sensor3_Image)
-
 def on_right_click(event):
     x = event.x
     y = event.y
@@ -102,6 +80,27 @@ def on_mid_click(event):
     x = event.x
     y = event.y
     canvas.coords(Usuario, x, y)
+
+def mover_Portal():
+    for i in range(3):
+        if plc.read("V90.0"):
+            plc.write("V80.0", 0)
+            time.sleep(3)
+            try:
+                plc.write("V80.1", 1)
+                break
+            except Exception as e:
+                time.sleep(0.5)
+                plc.write("V80.1", 1)
+        elif plc.read("V90.1"):
+            plc.write("V80.1", 0)
+            time.sleep(3)
+            try:
+                plc.write("V80.0", 1)
+                break
+            except Exception as e:
+                time.sleep(0.5)
+                plc.write("V80.0", 1)
 
 def actualizar():
 
@@ -127,11 +126,6 @@ def actualizar():
         canvas.itemconfig(Puerta, image=Puerta_Image)
     else:
         canvas.itemconfig(Puerta, image=Puerta2_Image)
-        
-    if plc.read("V50.0"):
-        canvas.itemconfig(portal_Abriendose, image=BotonZ_Image)
-    else:
-        canvas.itemconfig(portal_Abriendose, image="")
 
     if plc.read("V50.5"):
         canvas.itemconfig(luz_perimetro, image=Red_Light_Image)
@@ -155,8 +149,12 @@ def actualizar():
     else:
         canvas.itemconfig(Portal, image=Portal3_Image)
 
+    if plc.read("V50.0"):
+        t = threading.Thread(target=mover_Portal)
+        t.start()
+    
     root.after(100, actualizar)
-
+print(time.time())
 
 root = tk.Tk()
 root.title("Exportar Información")
@@ -175,7 +173,6 @@ Boton_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton.png"))
 Boton2_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton2.png"))
 Boton3_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton3.png"))
 BotonX_Image = ImageTk.PhotoImage(file=os.path.abspath("BotonX.png"))
-BotonZ_Image = ImageTk.PhotoImage(file=os.path.abspath("BotonZ.png"))
 SelectorOff = ImageTk.PhotoImage(file=os.path.abspath("SelectorOff.png"))
 SelectorOn = ImageTk.PhotoImage(file=os.path.abspath("SelectorOn.png"))
 
@@ -196,22 +193,6 @@ white_Light_off_Image = Image.open(os.path.abspath("Blanca_Apagada.png"))
 white_Light_off_Image.thumbnail((int(white_Light_off_Image.width * (porcentaje / 100)), int(white_Light_off_Image.height * (porcentaje / 100))))
 white_Light_off_Image = ImageTk.PhotoImage(white_Light_off_Image)
 
-
-porcentaje = 70
-Sensor_Image = Image.open(os.path.abspath("Sensor.png"))
-Sensor_Image.thumbnail((int(Sensor_Image.width * (porcentaje / 100)), int(Sensor_Image.height * (porcentaje / 100))))
-Sensor_Image = ImageTk.PhotoImage(Sensor_Image)
-Sensor2_Image = Image.open(os.path.abspath("Sensor2.png"))
-Sensor2_Image.thumbnail((int(Sensor2_Image.width * (porcentaje / 100)), int(Sensor2_Image.height * (porcentaje / 100))))
-Sensor2_Image = ImageTk.PhotoImage(Sensor2_Image)
-
-porcentaje = 25
-Sensor3_Image = Image.open(os.path.abspath("Sensor.png"))
-Sensor3_Image.thumbnail((int(Sensor3_Image.width * (porcentaje / 100)), int(Sensor3_Image.height * (porcentaje / 100))))
-Sensor3_Image = ImageTk.PhotoImage(Sensor3_Image)
-Sensor4_Image = Image.open(os.path.abspath("Sensor2.png"))
-Sensor4_Image.thumbnail((int(Sensor4_Image.width * (porcentaje / 100)), int(Sensor4_Image.height * (porcentaje / 100))))
-Sensor4_Image = ImageTk.PhotoImage(Sensor4_Image)
 
 Puerta_Image = ImageTk.PhotoImage(file=os.path.abspath("Puerta_Abierta.png"))
 Puerta2_Image = ImageTk.PhotoImage(file=os.path.abspath("Puerta_Cerrada.png"))
@@ -299,6 +280,8 @@ canvas.tag_bind(selector_Limpieza, '<Button-1>', lambda e: on_Limpieza())
 
 #Portal Abriendose
 portal_Abriendose = canvas.create_image(1680, 280, image="", anchor='nw')
+plc.write("V80.1", 1)
+plc.write("V80.0", 0)
 
 #####################################################################################################################################################
 
@@ -310,33 +293,6 @@ luz_perimetro = canvas.create_image(298, 77, image=white_Light_off_Image, anchor
 
 #Luz Blanca
 luz_blanca = canvas.create_image(351, 110, image=white_Light_off_Image, anchor=tk.CENTER)
-
-#####################################################################################################################################################
-
-#Sensor Portal Cerrado
-if plc.read("V90.0"):
-    sensor_cerrado = canvas.create_image(1800, 430, image=Sensor_Image, anchor=tk.CENTER)
-else:
-    sensor_cerrado = canvas.create_image(1800, 430, image=Sensor2_Image, anchor=tk.CENTER)
-canvas.tag_bind(sensor_cerrado, '<Button-1>', lambda e: on_sensor_cerrado())
-
-#####################################################################################################################################################
-
-#Sensor Portal Abierto
-if plc.read("V90.1"):
-    sensor_abierto = canvas.create_image(1800, 120, image=Sensor_Image, anchor=tk.CENTER)
-else:
-    sensor_abierto = canvas.create_image(1800, 120, image=Sensor2_Image, anchor=tk.CENTER)
-canvas.tag_bind(sensor_abierto, '<Button-1>', lambda e: on_sensor_abierto())
-
-#####################################################################################################################################################
-
-#Sensor Puerta Abierta
-if plc.read("V90.2"):
-    sensor_puerta = canvas.create_image(895, 180, image=Sensor3_Image, anchor=tk.CENTER)
-else:
-    sensor_puerta = canvas.create_image(895, 180, image=Sensor4_Image, anchor=tk.CENTER)
-canvas.tag_bind(sensor_puerta, '<Button-1>', lambda e: on_sensor_puerta())
 
 #####################################################################################################################################################
 
