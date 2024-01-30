@@ -113,6 +113,24 @@ def actualizar():
     else:
         canvas.itemconfig(luz_estados, image=BotonX_Image)
 
+    if plc.read("VW16")==1:
+        canvas.itemconfig(Texto_Estado, text="Libre") 
+    elif plc.read("VW16")==2:
+        canvas.itemconfig(Texto_Estado, text="Solicitud Checkin") 
+    elif plc.read("VW16")==3:
+        canvas.itemconfig(Texto_Estado, text="Ocupado")
+    elif plc.read("VW16")==4:
+        canvas.itemconfig(Texto_Estado, text="Esperando Checkout")
+    elif plc.read("VW16")==5:
+        canvas.itemconfig(Texto_Estado, text="Esperando Limpieza")
+    elif plc.read("VW16")==6:
+        canvas.itemconfig(Texto_Estado, text="En Limpieza")
+    elif plc.read("VW16")==7:
+        canvas.itemconfig(Texto_Estado, text="Bloqueado")
+    elif plc.read("VW16")==8:
+        canvas.itemconfig(Texto_Estado, text="Bloqueado")
+    
+
     if plc.read("V51.1"):
         canvas.itemconfig(Texto_Exterior, text="En Limpieza") 
     elif plc.read("V51.2"):
@@ -120,8 +138,8 @@ def actualizar():
     elif plc.read("V51.3"):
         canvas.itemconfig(Texto_Exterior, text="Esperando Salida")
     else: 
-        canvas.itemconfig(Texto_Exterior, text="")
-        
+        canvas.itemconfig(Texto_Exterior, text="")    
+    
     if plc.read("V50.1"):
         canvas.itemconfig(Puerta, image=Puerta_Image)
     else:
@@ -314,6 +332,12 @@ luz_estados = canvas.create_image(20, 120, image="", anchor=tk.CENTER)
 #Texto Exterior
 Cuadrado_Texto = canvas.create_rectangle(920, 210, 1020, 240, fill='lightgrey')
 Texto_Exterior = canvas.create_text(970, 225, text="", fill="black")
+
+#####################################################################################################################################################
+
+#Texto Estado
+Cuadrado_Estado = canvas.create_rectangle(1110, 50, 1230, 80, fill='lightgrey')
+Texto_Estado = canvas.create_text(1170, 65, text="a", fill="black")
 
 #####################################################################################################################################################
 
