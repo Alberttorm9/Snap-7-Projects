@@ -21,12 +21,12 @@ conn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database
 
 #####################################################################################################################################################
 
-start = datetime.now().strftime('%Y-%m-%d')
+start = date.today().replace(day=1).strftime('%Y-%m-%d')
 end = datetime.now().strftime('%Y-%m-%d')
 
-rutaErroresHabs = f"{config['RUTA']['ERRORES']}\\Errors Habs {start}"
-rutaErroresExits = f"{config['RUTA']['ERRORES']}\\Errors Exits {start}"
-rutaErroresReports = f"{config['RUTA']['ERRORES']}\\Errors Reports {start}"
+rutaErroresHabs = f"{config['RUTA']['ERRORES']}\\Errors Habs {start}-{end}"
+rutaErroresExits = f"{config['RUTA']['ERRORES']}\\Errors Exits {start}-{end}"
+rutaErroresReports = f"{config['RUTA']['ERRORES']}\\Errors Reports {start}-{end}"
 
 def export_Habs():
     cursor = conn.cursor()
@@ -110,7 +110,7 @@ def exportar_excel(rows, encabezados,CantidadValores, carpeta_exports, tabla):
             x=x+1
             y=0
 
-    wb.save(f'{carpeta_exports}\{tabla} {start}.xlsx')
+    wb.save(f'{carpeta_exports}\{tabla} {start}___{end}.xlsx')
 
 def export_elements():
     if not os.path.exists(config['RUTA']['ERRORES']):
