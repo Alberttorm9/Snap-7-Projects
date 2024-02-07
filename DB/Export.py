@@ -15,7 +15,7 @@ from openpyxl.styles import Font
 
 #Configparser
 config = configparser.ConfigParser()
-config.read(os.path.abspath("Config.ini"))
+config.read(os.path.abspath("scripts\Exportacion_Manual\Config.ini"))
 
 #####################################################################################################################################################
 
@@ -245,12 +245,12 @@ root.attributes("-topmost", True)
 #####################################################################################################################################################
 
 #Close App
-x_photo = PhotoImage(file=os.path.abspath("x_button.png"))
+x_photo = PhotoImage(file=os.path.abspath("scripts\\Exportacion_Manual\\x_button.png"))
 SysCloseButton = tk.Button(root, image=x_photo, borderwidth=0, bg= '#505050', command=sys.exit)
 SysCloseButton.place(relx=1, x=0, y=0, anchor='ne')
 
 #Go Back
-back_phooto = PhotoImage(file=os.path.abspath("Back_Button.png"))
+back_phooto = PhotoImage(file=os.path.abspath("scripts\\Exportacion_Manual\\Back_Button.png"))
 GoBackButton = tk.Button(root, image=back_phooto, borderwidth=0, bg= '#505050', command=lambda:GoBack(True))
 
 #####################################################################################################################################################
@@ -343,7 +343,7 @@ LabelHabs.grid(row=0, columnspan=6, pady=5)
 TableHabs = tk.Label(FrameExportHabs, text="Tabla:", bg= '#505050', fg='white')
 TableHabs.grid(row=1, column=1)
 
-with open('archivo_valores.txt', 'r') as file:
+with open('scripts\\Exportacion_Manual\\archivo_valores.txt', 'r') as file:
     ListHabs = file.readlines()
     ListHabs = [valor.strip() for valor in ListHabs]
 TableComboxHabs = ttk.Combobox(FrameExportHabs, values=ListHabs, width=31)
