@@ -82,25 +82,26 @@ def on_mid_click(event):
     canvas.coords(Usuario, x, y)
 
 def mover_Portal():
-    for i in range(5):
         if plc.read("V90.0"):
             plc.write("V80.0", 0)
             time.sleep(3)
-            try:
-                plc.write("V80.1", 1)
-                break
-            except Exception as e:
-                time.sleep(0.2)
-                plc.write("V80.1", 1)
+            for i in range(10):
+                try:
+                    plc.write("V80.1", 1)
+                    break
+                except Exception as e:
+                    time.sleep(0.2)
+                    plc.write("V80.1", 1)
         elif plc.read("V90.1"):
             plc.write("V80.1", 0)
             time.sleep(3)
-            try:
-                plc.write("V80.0", 1)
-                break
-            except Exception as e:
-                time.sleep(0.2)
-                plc.write("V80.0", 1)
+            for i in range(10):
+                try:
+                    plc.write("V80.0", 1)
+                    break
+                except Exception as e:
+                    time.sleep(0.2)
+                    plc.write("V80.0", 1)
 
 def actualizar():
 
