@@ -1,7 +1,7 @@
 import snap7
 import configparser
 config = configparser.ConfigParser()
-config.read(r'C:\Users\alber\Documents\Snap-7-Projects\SCADA Programs\SCADA 200\config.ini')
+config.read('config.ini')
 PLC_count = int(config.get('Settings', 'PLC_count'))
 bytes_in_read = int(config.get('Settings', 'bytes_in_read'))
 bytes_out_read = int(config.get('Settings', 'bytes_out_read'))
@@ -10,6 +10,7 @@ lista_out = []
 lista_in_out = []
 lista_PLC = []
 plc = snap7.logo.Logo()
+plc.set_param(snap7.types.PingTimeout, 200)
 simulador = 0
 cambiar_valores_simulados = 0
 
