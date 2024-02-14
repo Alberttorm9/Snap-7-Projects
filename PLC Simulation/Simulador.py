@@ -6,7 +6,7 @@ import threading
 import time
 
 plc = snap7.logo.Logo()
-plc.connect('192.168.30.102', 0, 1)
+plc.connect('192.168.30.101', 0, 1)
 plc.write("V60.7", 1)
 def on_Peticion_Salida():
     plc.write("V60.5", 1)
@@ -105,11 +105,13 @@ def mover_Portal():
 
 def actualizar():
 
-    if plc.read("V50.4"):
+    if plc.read("V12.4") and plc.read("V12.3") and plc.read("V12.2"):
+        canvas.itemconfig(luz_estados, image=Boton4_Image)
+    elif plc.read("V12.4"):
         canvas.itemconfig(luz_estados, image=Boton_Image)
-    elif plc.read("V50.3"):
+    elif plc.read("V12.3"):
         canvas.itemconfig(luz_estados, image=Boton3_Image)
-    elif plc.read("V50.2"):
+    elif plc.read("V12.2"):
         canvas.itemconfig(luz_estados, image=Boton2_Image)
     else:
         canvas.itemconfig(luz_estados, image=BotonX_Image)
@@ -127,39 +129,41 @@ def actualizar():
     elif plc.read("VW16")==6:
         canvas.itemconfig(Texto_Estado, text="En Limpieza")
     elif plc.read("VW16")==7:
-        canvas.itemconfig(Texto_Estado, text="Bloqueado")
+        canvas.itemconfig(Texto_Estado, text="Revision Limpieza")
     elif plc.read("VW16")==8:
         canvas.itemconfig(Texto_Estado, text="Bloqueado")
     
 
-    if plc.read("V51.1"):
+    if plc.read("V13.2"):
         canvas.itemconfig(Texto_Exterior, text="En Limpieza") 
-    elif plc.read("V51.2"):
+    elif plc.read("V13.3"):
         canvas.itemconfig(Texto_Exterior, text="Habitación Libre") 
-    elif plc.read("V51.3"):
-        canvas.itemconfig(Texto_Exterior, text="Esperando Salida")
     else: 
         canvas.itemconfig(Texto_Exterior, text="")    
     
-    if plc.read("V50.1"):
+    if plc.read("V12.1"):
         canvas.itemconfig(Puerta, image=Puerta_Image)
     else:
         canvas.itemconfig(Puerta, image=Puerta2_Image)
 
-    if plc.read("V50.5"):
+    if plc.read("V12.5"):
         canvas.itemconfig(luz_perimetro, image=Red_Light_Image)
-    elif plc.read("V50.6"):
+    elif plc.read("V12.6"):
         canvas.itemconfig(luz_perimetro, image=Green_Light_Image)
-    elif plc.read("V50.7"):
+    elif plc.read("V13.0"):
         canvas.itemconfig(luz_perimetro, image=Blue_Light_Image)
     else:
         canvas.itemconfig(luz_perimetro, image=white_Light_off_Image)
 
-    if plc.read("V51.0"):
+    if plc.read("V13.1"):
         canvas.itemconfig(luz_blanca, image=white_Light_on_Image)
     else:
         canvas.itemconfig(luz_blanca, image=white_Light_off_Image)
 
+    if plc.read("V13.6"):
+        canvas.itemconfig(luz_Limpieza, image=white_Light_on_Image)
+    else:
+        canvas.itemconfig(luz_Limpieza, image=white_Light_off_Image)
 
     if plc.read("V90.0"):
         canvas.itemconfig(Portal, image=Portal2_Image)
@@ -168,7 +172,7 @@ def actualizar():
     else:
         canvas.itemconfig(Portal, image=Portal3_Image)
 
-    if plc.read("V50.0"):
+    if plc.read("V12.0"):
         t = threading.Thread(target=mover_Portal)
         t.start()
     
@@ -191,6 +195,7 @@ Plano_image = ImageTk.PhotoImage(file=os.path.abspath("PLANO.png"))
 Boton_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton.png"))
 Boton2_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton2.png"))
 Boton3_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton3.png"))
+Boton4_Image = ImageTk.PhotoImage(file=os.path.abspath("Boton4.png"))
 BotonX_Image = ImageTk.PhotoImage(file=os.path.abspath("BotonX.png"))
 SelectorOff = ImageTk.PhotoImage(file=os.path.abspath("SelectorOff.png"))
 SelectorOn = ImageTk.PhotoImage(file=os.path.abspath("SelectorOn.png"))
@@ -315,6 +320,10 @@ luz_blanca = canvas.create_image(351, 110, image=white_Light_off_Image, anchor=t
 
 #####################################################################################################################################################
 
+#Luz Limpieza
+luz_Limpieza = canvas.create_image(401, 110, image=white_Light_off_Image, anchor=tk.CENTER)
+
+#####################################################################################################################################################
 #Puerta
 Puerta = canvas.create_image(890, 100, anchor=tk.CENTER)
 

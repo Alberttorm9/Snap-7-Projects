@@ -1,7 +1,7 @@
 import snap7
 import sys
 plc = snap7.logo.Logo()
-num=1
+num=0
 if __name__ == "__main__":
         
     ip = f'192.168.30.{num + 101}'
