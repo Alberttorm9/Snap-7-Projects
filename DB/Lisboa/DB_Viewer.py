@@ -7,12 +7,16 @@ from pandastable import Table
 import json
 import sys
 import customtkinter
+import threading
 
 config = configparser.ConfigParser()
 config.read('config/config.ini')
 
 width_config = int(config["GEOMETRIA"]["ANCHO"])
 heigth_config = int(config["GEOMETRIA"]["ALTO"])
+
+
+ReloadSpeed = int(config["CONFIG"]["ACT_TIME"])
 
 server = str(config["DB"]["DBSERVER"])
 database = str(config["DB"]["DBNAME"])
@@ -22,6 +26,7 @@ lang_codes = {'Ingles': 'en', 'Español': 'es', 'Português': 'pt'}
 theme_codes = {'Light': 'white', 'Dark': '#2d2d2d', 'lightblue': 'lightblue'}
 LastTableShown = None
 LastSize = None
+threads = []
 
 class CustomDialog(simpledialog.Dialog):
     def __init__(self, parent, text, accept, decline):
@@ -47,7 +52,7 @@ class CustomDialog(simpledialog.Dialog):
 
     def yes(self, event=None):
         self.ok()
-        sys.exit()
+        close_window_act()
 
     def no(self, event=None):
         self.cancel()
@@ -118,7 +123,11 @@ def close_window():
     root.protocol("WM_DELETE_WINDOW", close_window)
     CustomDialog(root, language['Ask_Exit'], language['Acc_Exit'], language['Dec_Exit'])
 
-
+def close_window_act():
+    for thread in threads:
+        thread.cancel()
+    sys.exit()
+    
 def maximize_window(event=None):
     global LastSize
     LastSize = root.geometry()
@@ -145,28 +154,46 @@ def change_language(event):
 def change_theme(event):
     global LastTableShown
     theme = theme_codes[theme_select.get()]
-    if theme == 'white':
+    value_list = list(theme_codes.values())
+    if theme == value_list[0]:
         root.config(bg=theme)
         FullFrame.config(bg=theme)
         TopFrame.config(bg=theme)
         FootFrame.config(bg=theme)
-    elif theme == '#2d2d2d':
+        update_button_alarm.configure(fg_color='#0179d8', hover_color='#0179d8', text_color='white')
+        update_button_event.configure(fg_color='#0179d8', hover_color='#0179d8', text_color='white')
+        theme_select.configure(fg_color='#0179d8', border_color='#0179d8', text_color='white')
+        lang_select.configure(fg_color='#0179d8', border_color='#0179d8', text_color='white')
+    elif theme == value_list[1]:
         root.config(bg=theme)
         FullFrame.config(bg=theme)
         TopFrame.config(bg=theme)
         FootFrame.config(bg=theme)
-    #14c0df
-    elif theme == 'lightblue':
+        update_button_alarm.configure(fg_color='#bb86fc', hover_color='#bb86fc', text_color='black')
+        update_button_event.configure(fg_color='#bb86fc', hover_color='#bb86fc', text_color='black')
+        theme_select.configure(fg_color='#bb86fc', border_color='#bb86fc', text_color='black')
+        lang_select.configure(fg_color='#bb86fc', border_color='#bb86fc', text_color='black')
+    elif theme == value_list[2]:
         root.config(bg=theme)
         FullFrame.config(bg=theme)
         TopFrame.config(bg=theme)
         FootFrame.config(bg=theme)
+        update_button_alarm.configure(fg_color='#D35B58', hover_color='#D35B58', text_color='white')
+        update_button_event.configure(fg_color='#D35B58', hover_color='#D35B58', text_color='white')
+        theme_select.configure(fg_color='#D35B58', border_color='#D35B58', text_color='white')
+        lang_select.configure(fg_color='#D35B58', border_color='#D35B58', text_color='white')
+        
     if LastTableShown == 'alarm':
         read_db_alarm()
     elif LastTableShown == 'event':
         read_db_event()
         
-
+def check_auto_update():
+    if auto_update.get():
+        read_db_event()
+    thread = threading.Timer(ReloadSpeed, check_auto_update)
+    thread.start()
+    threads.append(thread)
 
 def read_db_alarm():
     global LastTableShown
@@ -179,8 +206,7 @@ def read_db_alarm():
         'Al_Start_Time': language['Al_Start_Time'],
         'Al_Message': language['Al_Message'],
         'Al_Ack_Time': language['Al_Ack_Time'],
-    }, inplace=True)
-    df = df.iloc[::-1]  
+    }, inplace=True)  
     df = df.infer_objects()  
     pd.set_option('future.no_silent_downcasting', True)
     table = Table(DbViewerFrame, width=width_config-(width_config//3), dataframe=df, showtoolbar=True, showstatusbar=True, maxcellwidth=1000)
@@ -204,7 +230,6 @@ def read_db_event():
         'Ev_Message': language['Ev_Message'],
         'Ev_Station': language['Ev_Station']
     }, inplace=True)
-    df = df.iloc[::-1]  
     df = df.infer_objects()
     pd.set_option('future.no_silent_downcasting', True)
     table = Table(DbViewerFrame, width=width_config-(width_config//5), dataframe=df, showtoolbar=True, showstatusbar=True, maxcellwidth=1000)
@@ -255,6 +280,9 @@ y_photo = PhotoImage(file=("resources/y_button.png"))
 #Muestra los eventos por defecto
 read_db_event()
 
+auto_update = tk.BooleanVar()
+auto_update.set(False)
+
 close_button = tk.Button(FullFrame, bg='lightgrey', image=x_photo, borderwidth=0, highlightthickness=0,  command=close_window)
 close_button.place(relx=1, rely=0, anchor='ne')
 
@@ -262,10 +290,10 @@ fullscreen_button = tk.Button(FullFrame, bg='lightgrey', image=y_photo, borderwi
 fullscreen_button.place(x=root.winfo_width()-49, rely=0, anchor='ne')
 
 
-update_button_alarm = customtkinter.CTkButton(FootFrame, text=language['refresh_alarms'], command=read_db_alarm, fg_color="#D35B58", hover_color="#C77C78")
+update_button_alarm = customtkinter.CTkButton(FootFrame, text=language['refresh_alarms'], command=read_db_alarm, fg_color="#D35B58", hover_color="#D35B58")
 update_button_alarm.grid(row=1, column=1, padx=5, pady=5)
 
-update_button_event = customtkinter.CTkButton(FootFrame, text=language['refresh_events'], command=read_db_event, fg_color="#D35B58", hover_color="#C77C78")
+update_button_event = customtkinter.CTkButton(FootFrame, text=language['refresh_events'], command=read_db_event, fg_color="#D35B58", hover_color="#D35B58")
 update_button_event.grid(row=1, column=2, padx=5, pady=5)
 
 lang_select = customtkinter.CTkComboBox(TopFrame, values=list(lang_codes.keys()), fg_color="#D35B58", border_color="#D35B58", command=change_language)
@@ -276,5 +304,9 @@ theme_select = customtkinter.CTkComboBox(TopFrame, values=list(theme_codes.keys(
 theme_select.set('lightblue')
 theme_select.grid(row=1, column=2, padx=10, pady=5)
 
+check_button = tk.Checkbutton(TopFrame, text=language['Update_Text'], variable=auto_update)
+check_button.grid(row=1, column=3, padx=10, pady=5)
+
+check_auto_update()
 calculate_font()
 root.mainloop()

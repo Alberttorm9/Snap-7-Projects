@@ -11,5 +11,6 @@
     "Al_Ack_Time": "Tempo de confirmação do alarme",
     "Ask_Exit": "Tem certeza que deseja sair?",
     "Acc_Exit": "Aceitar",
-    "Dec_Exit": "Declínio"
+    "Dec_Exit": "Declínio",
+    "Update_Text": "Atualizar automaticamente"
 }

@@ -11,5 +11,6 @@
     "Al_Ack_Time": "Hora Acuse Alarma",
     "Ask_Exit": "Estas seguro que quieres salir?",
     "Acc_Exit": "Aceptar",
-    "Dec_Exit": "Rechazar"
+    "Dec_Exit": "Rechazar",
+    "Update_Text": "Actualizar Automaticamente"
 }
