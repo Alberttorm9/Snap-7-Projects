@@ -1,27 +1,33 @@
 import tkinter as tk
-import configparser
+import sys
+from tkinter import simpledialog
 
-def adjust_size(width, height):
-    new_font_size = min(width // 20, height // 20)
-    OpenFrameReportes.config(font=("Arial", new_font_size))
+class CustomDialog(simpledialog.Dialog):
+    def body(self, master):
+        tk.Label(master, text="¿Estás seguro de que quieres salir?").grid(row=0)
 
-# Leer la configuración desde el archivo .ini
-config = configparser.ConfigParser()
-config.read('config2.ini')
-width = config.getint('GUI', 'width')
-height = config.getint('GUI', 'height')
+    def buttonbox(self):
+        box = tk.Frame(self)
+
+        tk.Button(box, text="Sí, quiero salir", width=10, command=self.yes, default="active").pack(side="left", padx=5, pady=5)
+        tk.Button(box, text="No, quiero quedarme", width=10, command=self.no).pack(side="left", padx=5, pady=5)
+
+        self.bind("<Return>", self.yes)
+        self.bind("<Escape>", self.no)
+
+        box.pack()
+
+    def yes(self, event=None):
+        self.ok()
+        sys.exit()
+
+    def no(self, event=None):
+        self.cancel()
 
 root = tk.Tk()
-root.geometry(f"{width}x{height}")
 
-# Suponiendo que 'OpenFrameReportes' es un botón de tu interfaz
-OpenFrameReportes = tk.Button(root, text="Exportar Reportes", font=("Arial", 40))
-OpenFrameReportes.grid(row=1, column=0, padx=10, pady=10)
+def close_window():
+    CustomDialog(root)
 
-# Llamamos a adjust_size una vez al inicio para ajustar el tamaño
-adjust_size(width, height)
-
-root.grid_rowconfigure(0, weight=1)
-root.grid_columnconfigure(0, weight=1)
-
+root.protocol("WM_DELETE_WINDOW", close_window)
 root.mainloop()

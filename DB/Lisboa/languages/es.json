@@ -1,0 +1,15 @@
+{
+    "title": "Lector de base de datos",
+    "refresh_alarms": "Ver/Actualizar Alarmas",
+    "refresh_events": "Ver/Actualizar Eventos",
+    "Ev_Time": "Hora De Evento",
+    "Ev_User": "Usuario",
+    "Ev_Message": "Mensaje",
+    "Ev_Station": "Estación",
+    "Al_Start_Time": "Inicio Alarma",
+    "Al_Message": "Mensaje De Alarma",
+    "Al_Ack_Time": "Hora Acuse Alarma",
+    "Ask_Exit": "Estas seguro que quieres salir?",
+    "Acc_Exit": "Aceptar",
+    "Dec_Exit": "Rechazar"
+}

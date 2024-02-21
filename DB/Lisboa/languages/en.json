@@ -1,0 +1,15 @@
+{
+    "title": "Database Reader",
+    "refresh_alarms": "See/Update Alarms",
+    "refresh_events": "See/Update Events",
+    "Ev_Time": "Event Trigger",
+    "Ev_User": "User",
+    "Ev_Message": "Message",
+    "Ev_Station": "Station",
+    "Al_Start_Time": "Alarm Start Time",
+    "Al_Message": "Alarm Message",
+    "Al_Ack_Time": "Alarm Actuse Time",
+    "Ask_Exit": "Are you sure you want to exit?",
+    "Acc_Exit": "Accept",
+    "Dec_Exit": "Decline"
+}
