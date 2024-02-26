@@ -17,6 +17,7 @@ heigth_config = int(config["GEOMETRIA"]["ALTO"])
 
 
 ReloadSpeed = int(config["CONFIG"]["ACT_TIME"])
+MaxResults = int(config["CONFIG"]["MAX_RESULTS"])
 
 server = str(config["DB"]["DBSERVER"])
 database = str(config["DB"]["DBNAME"])
@@ -52,7 +53,7 @@ class CustomDialog(simpledialog.Dialog):
 
     def yes(self, event=None):
         self.ok()
-        close_window_act()
+        closeGUI_act()
 
     def no(self, event=None):
         self.cancel()
@@ -71,6 +72,7 @@ def calculate_font():
         theme_select.configure(font=("Arial", 12))
     
     fullscreen_button.place(x=root.winfo_width()-49, rely=0)
+    minimize_button.place(x=root.winfo_width()-70, rely=0)
     
 
 def start_move(event):
@@ -119,21 +121,28 @@ def do_resize(event):
 
 
 #Close program
-def close_window():
-    root.protocol("WM_DELETE_WINDOW", close_window)
+def closeGUI():
+    root.protocol("WM_DELETE_WINDOW", closeGUI)
     CustomDialog(root, language['Ask_Exit'], language['Acc_Exit'], language['Dec_Exit'])
 
-def close_window_act():
+def closeGUI_act():
     for thread in threads:
         thread.cancel()
     sys.exit()
     
-def maximize_window(event=None):
+def maximizeGUI(event=None):
     global LastSize
     LastSize = root.geometry()
     root.geometry("{0}x{1}+0+0".format(root.winfo_screenwidth(), root.winfo_screenheight()))
     calculate_font()
     
+def minimizeGUI():
+        root.state('withdrawn')
+        root.overrideredirect(False)
+        root.state('iconic')
+
+def frameMapped(event=None):
+    root.overrideredirect(True)
 
 def load_language(lang):
     with open(f'languages/{lang}.json', 'r', encoding='utf-8') as f:
@@ -189,8 +198,12 @@ def change_theme(event):
         read_db_event()
         
 def check_auto_update():
+    global LastTableShown
     if auto_update.get():
-        read_db_event()
+        if LastTableShown == 'alarm':
+            read_db_alarm()
+        elif LastTableShown == 'event':
+            read_db_event()
     thread = threading.Timer(ReloadSpeed, check_auto_update)
     thread.start()
     threads.append(thread)
@@ -198,7 +211,7 @@ def check_auto_update():
 def read_db_alarm():
     global LastTableShown
     cursor = conn.cursor()
-    cursor.execute("SELECT Al_Start_Time, Al_Message, Al_Ack_Time  FROM ALARMHISTORY") 
+    cursor.execute(f"SELECT TOP {MaxResults} Al_Start_Time, Al_Message, Al_Ack_Time  FROM ALARMHISTORY ORDER BY Ev_Time DESC") 
     rows = cursor.fetchall()
     columns = [column[0] for column in cursor.description]
     df = pd.DataFrame.from_records(rows, columns=columns)
@@ -207,7 +220,7 @@ def read_db_alarm():
         'Al_Message': language['Al_Message'],
         'Al_Ack_Time': language['Al_Ack_Time'],
     }, inplace=True)  
-    df = df.infer_objects()  
+    df = df.infer_objects()
     pd.set_option('future.no_silent_downcasting', True)
     table = Table(DbViewerFrame, width=width_config-(width_config//3), dataframe=df, showtoolbar=True, showstatusbar=True, maxcellwidth=1000)
     table.show()
@@ -220,7 +233,7 @@ def read_db_alarm():
 def read_db_event():
     global LastTableShown
     cursor = conn.cursor()
-    cursor.execute("SELECT Ev_Time, Ev_User, Ev_Message, Ev_Station  FROM EVENTHISTORY") 
+    cursor.execute(f"SELECT TOP {MaxResults} Ev_Time, Ev_User, Ev_Message, Ev_Station  FROM EVENTHISTORY ORDER BY Ev_Time DESC") 
     rows = cursor.fetchall()
     columns = [column[0] for column in cursor.description]
     df = pd.DataFrame.from_records(rows, columns=columns)
@@ -273,9 +286,14 @@ root.bind("<ButtonPress-3>", start_resize)
 root.bind("<ButtonRelease-3>", stop_resize)
 root.bind("<B3-Motion>", do_resize)
 
+#Showagain
+root.bind("<Map>", frameMapped)
+
+
 #Image Sources
 x_photo = PhotoImage(file=("resources/x_button.png"))
 y_photo = PhotoImage(file=("resources/y_button.png"))
+z_photo = PhotoImage(file=("resources/z_button.png"))
 
 #Muestra los eventos por defecto
 read_db_event()
@@ -283,12 +301,14 @@ read_db_event()
 auto_update = tk.BooleanVar()
 auto_update.set(False)
 
-close_button = tk.Button(FullFrame, bg='lightgrey', image=x_photo, borderwidth=0, highlightthickness=0,  command=close_window)
+close_button = tk.Button(FullFrame, bg='lightgrey', image=x_photo, borderwidth=0, highlightthickness=0,  command=closeGUI)
 close_button.place(relx=1, rely=0, anchor='ne')
 
-fullscreen_button = tk.Button(FullFrame, bg='lightgrey', image=y_photo, borderwidth=0, highlightthickness=0,  command=maximize_window)
+fullscreen_button = tk.Button(FullFrame, bg='lightgrey', image=y_photo, borderwidth=0, highlightthickness=0,  command=maximizeGUI)
 fullscreen_button.place(x=root.winfo_width()-49, rely=0, anchor='ne')
 
+minimize_button = tk.Button(FullFrame, bg='lightgrey', image=z_photo, borderwidth=0, highlightthickness=0,  command=minimizeGUI)
+minimize_button.place(x=root.winfo_width()-70, rely=0, anchor='ne')
 
 update_button_alarm = customtkinter.CTkButton(FootFrame, text=language['refresh_alarms'], command=read_db_alarm, fg_color="#D35B58", hover_color="#D35B58")
 update_button_alarm.grid(row=1, column=1, padx=5, pady=5)
