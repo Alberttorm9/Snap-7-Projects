@@ -77,29 +77,77 @@ def SensorPuertaEntradaAct():
     else:
         plc.write("V70.2", 1)
 
+def PulsadorGarajeAct():
+    if plc.read("V70.3"):
+        plc.write("V70.3", 0)
+    else:
+        plc.write("V70.3", 1)
+
+def RectonnectAct():
+    if plc.get_connected:
+        plc.disconnect()
+        plc.connect("192.168.30.101", 0, 1)
+    else:
+        plc.connect("192.168.30.101", 0, 1)
+
+
+def actualizar():
+
+    if plc.read("V12.1"):
+        PuertaPeatonal.config(text="Puerta Peatonal: " + "1")
+    else:
+        PuertaPeatonal.config(text="Puerta Peatonal: " + "0")
+    
+    if plc.read("V80.0"):
+        AbriendoPortal.config(text="Portal Abrir: " + "1")
+    else:
+        AbriendoPortal.config(text="Portal Abrir: " + "0")
+    
+    if plc.read("V80.1"):
+        CerrandoPortal.config(text="Portal Cerrar: " + "1")
+    else:
+        CerrandoPortal.config(text="Portal Cerrar: " + "0")
+
+    root.after(100, actualizar)
 
 root = tk.Tk()
 
 SensorPortalAbriendo = tk.Button(root, text= "Sensor Abriendo", command=SensorPortalAbriendoAct)
-SensorPortalAbriendo.pack()
+SensorPortalAbriendo.grid(row=1,column=1)
 SensorPortalCerrando = tk.Button(root, text= "Sensor Cerrando", command=SensorPortalCerrandoAct)
-SensorPortalCerrando.pack()
+SensorPortalCerrando.grid(row=2,column=1)
 ActivarAlarmaPortal = tk.Button(root, text= "Activar Alarma", command=ActivarAlarmaPortalAct)
-ActivarAlarmaPortal.pack()
+ActivarAlarmaPortal.grid(row=3,column=1)
 SelectorLimpieza = tk.Button(root, text= "Selector Limpieza", command=SelectorLimpiezaAct)
-SelectorLimpieza.pack()
+SelectorLimpieza.grid(row=4,column=1)
 CheckinOK = tk.Button(root, text= "Checkin OK", command=CheckinOKAct)
-CheckinOK.pack()
+CheckinOK.grid(row=5,column=1)
 CheckoutOK = tk.Button(root, text= "Checkout OK", command=CheckoutOKAct)
-CheckoutOK.pack()
+CheckoutOK.grid(row=6,column=1)
 SolicitudCheckin = tk.Button(root, text= "Solicitud Checkin", command=SolicitudCheckinAct)
-SolicitudCheckin.pack()
+SolicitudCheckin.grid(row=7,column=1)
 RGB = tk.Button(root, text= "RGB", command=RGBAct)
-RGB.pack()
+RGB.grid(row=8,column=1)
 LuzBlanca = tk.Button(root, text= "Luz Blanca", command=LuzBlancaAct)
-LuzBlanca.pack()
+LuzBlanca.grid(row=9,column=1)
 SolicitudCheckout = tk.Button(root, text= "Solicitud Checkout", command=SolicitudCheckoutAct)
-SolicitudCheckout.pack()
+SolicitudCheckout.grid(row=10,column=1)
 SensorPuertaEntrada = tk.Button(root, text= "Sensor Puerta Entrada", command=SensorPuertaEntradaAct)
-SensorPuertaEntrada.pack()
+SensorPuertaEntrada.grid(row=11,column=1)
+PulsadorGaraje = tk.Button(root, text= "Pulsador Garaje", command=PulsadorGarajeAct)
+PulsadorGaraje.grid(row=12,column=1)
+Rectonnect = tk.Button(root, text= "Rectonnect", command=RectonnectAct)
+Rectonnect.grid(row=13,column=1)
 
+PuertaPeatonal = tk.Label(root)
+PuertaPeatonal.grid(row=1,column=2)
+
+AbriendoPortal = tk.Label(root)
+AbriendoPortal.grid(row=2,column=2)
+
+CerrandoPortal = tk.Label(root)
+CerrandoPortal.grid(row=3,column=2)
+
+actualizar()
+
+root.mainloop()
